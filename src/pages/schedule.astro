@@ -1,0 +1,136 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ScheduleItem from '../components/ScheduleItem.astro';
+import { getScheduledActivities } from '../lib/db';
+
+// Fetch all scheduled activities
+const activities = getScheduledActivities();
+
+// Group activities by day
+const groupedByDay: Record<string, typeof activities> = {};
+activities.forEach(activity => {
+  if (activity.scheduled_start) {
+    const date = new Date(activity.scheduled_start);
+    const dayKey = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    if (!groupedByDay[dayKey]) {
+      groupedByDay[dayKey] = [];
+    }
+    groupedByDay[dayKey].push(activity);
+  }
+});
+
+const days = Object.keys(groupedByDay);
+---
+
+<BaseLayout title="Schedule - TwinkyMeet" description="View the complete schedule of activities and events">
+  <div class="bg-gray-50 min-h-screen">
+    <!-- Header Section -->
+    <section class="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Event Schedule</h1>
+        <p class="text-xl text-indigo-100">Check out what's planned for TwinkyMeet</p>
+      </div>
+    </section>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <!-- Filter Placeholders (non-functional for now - Phase 7) -->
+      <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+        <div class="flex flex-wrap gap-3 items-center">
+          <span class="text-sm font-medium text-gray-700">Filter by:</span>
+          <button class="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+            All Days
+          </button>
+          <button class="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+            Time of Day
+          </button>
+          <button class="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+            Activity Type
+          </button>
+          <span class="text-xs text-gray-500 ml-auto">(Filters coming soon)</span>
+        </div>
+      </div>
+
+      <!-- Schedule Content -->
+      {activities.length === 0 ? (
+        <!-- Empty State -->
+        <div class="bg-white rounded-lg shadow-sm p-12 text-center">
+          <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">No Activities Scheduled Yet</h3>
+          <p class="text-gray-600 mb-6">
+            The schedule is being finalized. Check back soon or propose your own activity!
+          </p>
+          <div class="flex justify-center gap-4">
+            <a
+              href="/submit-activity"
+              class="inline-block bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+            >
+              Suggest an Activity
+            </a>
+            <a
+              href="/activities"
+              class="inline-block bg-white text-indigo-600 px-6 py-2 rounded-lg font-medium border-2 border-indigo-600 hover:bg-indigo-50 transition-colors"
+            >
+              View All Activities
+            </a>
+          </div>
+        </div>
+      ) : (
+        <!-- Activities grouped by day -->
+        <div class="space-y-8">
+          {days.map(day => (
+            <div>
+              <div class="flex items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">{day}</h2>
+                <div class="ml-4 flex-1 h-px bg-gray-300"></div>
+              </div>
+              <div class="space-y-4">
+                {groupedByDay[day].map(activity => (
+                  <ScheduleItem activity={activity} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <!-- Info Box -->
+      {activities.length > 0 && (
+        <div class="mt-8 bg-indigo-50 border border-indigo-200 rounded-lg p-6">
+          <div class="flex">
+            <svg class="w-6 h-6 text-indigo-600 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-1">Schedule Notes</h3>
+              <ul class="text-sm text-gray-700 space-y-1">
+                <li>• All times are subject to change. Check back for updates!</li>
+                <li>• Participation is entirely optional – join what interests you</li>
+                <li>• Some activities may have capacity limits</li>
+                <li>• Want to host something? <a href="/submit-activity" class="text-indigo-600 hover:text-indigo-700 underline">Submit an activity</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <!-- View All Activities Link -->
+      {activities.length > 0 && (
+        <div class="text-center mt-8">
+          <a
+            href="/activities"
+            class="inline-flex items-center text-indigo-600 hover:text-indigo-700 font-medium"
+          >
+            View detailed activity catalog
+            <svg class="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+        </div>
+      )}
+
+    </div>
+  </div>
+</BaseLayout>

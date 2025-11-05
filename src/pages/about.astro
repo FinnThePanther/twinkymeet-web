@@ -1,0 +1,301 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getSetting } from '../lib/db';
+
+// Fetch event details from settings
+const eventDateStart = getSetting('event_date_start') || '2026-07-01';
+const eventDateEnd = getSetting('event_date_end') || '2026-07-05';
+const location = getSetting('location') || 'Location TBD';
+
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+};
+---
+
+<BaseLayout title="About TwinkyMeet" description="Learn more about TwinkyMeet, our summer furry gathering">
+  <div class="bg-white">
+    <!-- Header Section -->
+    <section class="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white py-16">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">About TwinkyMeet</h1>
+        <p class="text-xl text-indigo-100">Your guide to our summer gathering</p>
+      </div>
+    </section>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+      <!-- What is TwinkyMeet -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">What is TwinkyMeet?</h2>
+        <div class="prose prose-lg text-gray-600">
+          <p>
+            TwinkyMeet is an intimate summer mini-convention bringing together a close-knit community
+            of furry friends for a long weekend of fun, creativity, and connection. With 15-20 attendees,
+            our gathering offers a perfect blend of organized activities and casual hangout time.
+          </p>
+          <p>
+            Whether you're into gaming, outdoor adventures, creative workshops, or just relaxing with
+            friends, TwinkyMeet has something for everyone. Our welcoming atmosphere encourages both
+            participation and relaxation – join in on group activities or enjoy some downtime at your own pace.
+          </p>
+        </div>
+      </section>
+
+      <!-- Event Details -->
+      <section class="mb-12 bg-indigo-50 rounded-lg p-6">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Event Details</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Dates</h3>
+            <p class="text-gray-600">{formatDate(eventDateStart)} - {formatDate(eventDateEnd)}</p>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Location</h3>
+            <p class="text-gray-600">{location}</p>
+            <p class="text-sm text-gray-500 mt-1">Full address will be provided to confirmed attendees</p>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Capacity</h3>
+            <p class="text-gray-600">15-20 attendees</p>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Accommodations</h3>
+            <p class="text-gray-600">Shared venue with sleeping spaces</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- What to Bring -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">What to Bring</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Essentials</h3>
+            <ul class="space-y-2 text-gray-600">
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-indigo-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Bedding and pillows (sheets, blankets, sleeping bag)
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-indigo-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Towels and toiletries
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-indigo-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Comfortable clothes and sleepwear
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-indigo-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Medications and any special needs items
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Optional But Fun</h3>
+            <ul class="space-y-2 text-gray-600">
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-indigo-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Fursuit or costumes
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-indigo-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Board games, video games, or activities to share
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-indigo-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Snacks or treats to share with the group
+              </li>
+              <li class="flex items-start">
+                <svg class="w-5 h-5 text-indigo-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Art supplies or craft materials
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Food Situation -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Food Situation</h2>
+        <div class="prose prose-lg text-gray-600">
+          <p>
+            We'll provide communal meals throughout the event. Please indicate any dietary restrictions
+            or allergies when you RSVP so we can accommodate everyone's needs.
+          </p>
+          <ul class="list-disc pl-6 space-y-2">
+            <li>Breakfast, lunch, and dinner will be provided</li>
+            <li>Vegetarian, vegan, and other dietary options available</li>
+            <li>Snacks and drinks available throughout the day</li>
+            <li>BYOB (Bring Your Own Beverages) if you have specific preferences</li>
+            <li>Feel free to bring snacks to share with the group!</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Code of Conduct -->
+      <section class="mb-12 border-l-4 border-indigo-600 pl-6">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Code of Conduct</h2>
+        <div class="prose prose-lg text-gray-600">
+          <p class="font-semibold text-gray-900">
+            TwinkyMeet is committed to providing a welcoming, safe, and inclusive environment for all attendees.
+          </p>
+          <h3 class="text-xl font-semibold text-gray-900 mt-4">Core Principles</h3>
+          <ul class="list-disc pl-6 space-y-2">
+            <li><strong>Respect:</strong> Treat all attendees with kindness and respect</li>
+            <li><strong>Consent:</strong> Always ask before physical contact, photos, or personal interactions</li>
+            <li><strong>Inclusivity:</strong> Welcome people of all backgrounds, identities, and experience levels</li>
+            <li><strong>Safety:</strong> Look out for each other and report concerns to organizers</li>
+            <li><strong>Communication:</strong> Be clear about boundaries and respect others' limits</li>
+          </ul>
+          <p class="mt-4">
+            Harassment of any kind will not be tolerated. If you experience or witness any concerning
+            behavior, please contact an organizer immediately. We're here to ensure everyone has a great time!
+          </p>
+        </div>
+      </section>
+
+      <!-- Parking & Travel -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Parking & Travel Information</h2>
+        <div class="prose prose-lg text-gray-600">
+          <p>
+            Detailed parking and travel information will be provided to confirmed attendees.
+            Carpooling is encouraged! We'll set up a coordination system to help attendees connect
+            for shared rides.
+          </p>
+          <ul class="list-disc pl-6 space-y-2">
+            <li>Ample parking available on-site</li>
+            <li>Nearby airport information will be provided</li>
+            <li>Carpooling coordination available</li>
+            <li>Local ride-share services available</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section class="mb-12 bg-gray-50 rounded-lg p-6">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Contact Information</h2>
+        <p class="text-gray-600 mb-4">
+          Have questions or concerns? We're here to help!
+        </p>
+        <div class="flex items-center text-gray-700">
+          <svg class="w-6 h-6 text-indigo-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <a href="mailto:info@twinkymeet.com" class="text-indigo-600 hover:text-indigo-700 font-medium">
+            info@twinkymeet.com
+          </a>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
+        <div class="space-y-4">
+
+          <details class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <summary class="font-semibold text-gray-900 cursor-pointer">
+              Is this event 18+?
+            </summary>
+            <p class="mt-3 text-gray-600">
+              Yes, all attendees must be 18 years or older. Some activities may be marked as 18+ for mature content.
+            </p>
+          </details>
+
+          <details class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <summary class="font-semibold text-gray-900 cursor-pointer">
+              How much does it cost?
+            </summary>
+            <p class="mt-3 text-gray-600">
+              Attendance fees cover venue rental, food, and supplies. Payment information and the exact amount
+              will be provided when you RSVP. We keep costs reasonable to make the event accessible to everyone!
+            </p>
+          </details>
+
+          <details class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <summary class="font-semibold text-gray-900 cursor-pointer">
+              Can I bring a guest (+1)?
+            </summary>
+            <p class="mt-3 text-gray-600">
+              Due to our intimate group size, we ask that you check with organizers before bringing a guest.
+              There's a +1 option in the RSVP form – we'll follow up to discuss!
+            </p>
+          </details>
+
+          <details class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <summary class="font-semibold text-gray-900 cursor-pointer">
+              What if I have dietary restrictions or allergies?
+            </summary>
+            <p class="mt-3 text-gray-600">
+              Please list all dietary restrictions and allergies in your RSVP form. We'll make sure to
+              accommodate your needs with appropriate meal options!
+            </p>
+          </details>
+
+          <details class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <summary class="font-semibold text-gray-900 cursor-pointer">
+              Do I need to bring my fursuit?
+            </summary>
+            <p class="mt-3 text-gray-600">
+              Fursuits are completely optional! Bring yours if you'd like to suit up, but there's no
+              pressure. Many attendees don't have suits, and everyone is welcome either way.
+            </p>
+          </details>
+
+          <details class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <summary class="font-semibold text-gray-900 cursor-pointer">
+              What's the schedule like?
+            </summary>
+            <p class="mt-3 text-gray-600">
+              We have a mix of organized activities and free time. You're welcome to participate in
+              everything or just the activities that interest you. Check out our <a href="/schedule" class="text-indigo-600 hover:text-indigo-700">schedule page</a>
+              for the full lineup!
+            </p>
+          </details>
+
+          <details class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <summary class="font-semibold text-gray-900 cursor-pointer">
+              Can I suggest or host an activity?
+            </summary>
+            <p class="mt-3 text-gray-600">
+              Absolutely! We encourage attendees to propose activities. Use our
+              <a href="/submit-activity" class="text-indigo-600 hover:text-indigo-700">activity submission form</a>
+              to suggest something you'd like to host or participate in.
+            </p>
+          </details>
+
+        </div>
+      </section>
+
+      <!-- CTA Section -->
+      <section class="text-center py-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Ready to Join Us?</h2>
+        <p class="text-gray-600 mb-6">Reserve your spot at TwinkyMeet today!</p>
+        <a
+          href="/rsvp"
+          class="inline-block bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors shadow-md"
+        >
+          RSVP Now
+        </a>
+      </section>
+
+    </div>
+  </div>
+</BaseLayout>
