@@ -7,15 +7,20 @@ const eventDateStart = getSetting('event_date_start') || '2026-07-01';
 const eventDateEnd = getSetting('event_date_end') || '2026-07-05';
 const location = getSetting('location') || 'Location TBD';
 
-// Format dates for display
+// Format dates for display - add T00:00:00 to parse as local time instead of UTC
 const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr);
+  const date = new Date(dateStr + 'T00:00:00');
   return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 };
 
-const startDate = new Date(eventDateStart);
-const endDate = new Date(eventDateEnd);
-const dateDisplay = `${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}-${endDate.getDate()}, ${endDate.getFullYear()}`;
+const startDate = new Date(eventDateStart + 'T00:00:00');
+const endDate = new Date(eventDateEnd + 'T00:00:00');
+
+// Format date range display - check if same month or different months
+const isSameMonth = startDate.getMonth() === endDate.getMonth() && startDate.getFullYear() === endDate.getFullYear();
+const dateDisplay = isSameMonth
+  ? `${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}-${endDate.getDate()}, ${endDate.getFullYear()}`
+  : `${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}-${endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}, ${endDate.getFullYear()}`;
 
 // Get sample activities for highlights (upcoming scheduled activities)
 const scheduledActivities = getAllActivities('scheduled').slice(0, 3);

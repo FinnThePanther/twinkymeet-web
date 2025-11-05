@@ -232,6 +232,31 @@ export function insertAnnouncement(message: string): number {
   return result.lastInsertRowid as number;
 }
 
+export function getAllAnnouncements(): Announcement[] {
+  const stmt = getDb().prepare('SELECT * FROM announcements ORDER BY created_at DESC');
+  return stmt.all() as Announcement[];
+}
+
+export function getAnnouncementById(id: number): Announcement | undefined {
+  const stmt = getDb().prepare('SELECT * FROM announcements WHERE id = ?');
+  return stmt.get(id) as Announcement | undefined;
+}
+
+export function updateAnnouncement(id: number, message: string): void {
+  const stmt = getDb().prepare('UPDATE announcements SET message = ? WHERE id = ?');
+  stmt.run(message, id);
+}
+
+export function toggleAnnouncementActive(id: number, active: boolean): void {
+  const stmt = getDb().prepare('UPDATE announcements SET active = ? WHERE id = ?');
+  stmt.run(active ? 1 : 0, id);
+}
+
+export function deleteAnnouncement(id: number): void {
+  const stmt = getDb().prepare('DELETE FROM announcements WHERE id = ?');
+  stmt.run(id);
+}
+
 // Specialized activity queries for Phase 2
 export function getScheduledActivities(): Activity[] {
   const stmt = getDb().prepare(`
