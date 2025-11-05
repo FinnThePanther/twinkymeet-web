@@ -1,5 +1,5 @@
 ---
-
+import '../styles/global.css';
 ---
 
 <html lang="en">
@@ -8,9 +8,12 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>TwinkyMeet</title>
 	</head>
-	<body>
-		<h1>Astro</h1>
+	<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+		<div class="text-center">
+			<h1 class="text-4xl font-bold text-indigo-600 mb-4">TwinkyMeet</h1>
+			<p class="text-gray-600 text-lg">Tailwind CSS is working!</p>
+		</div>
 	</body>
 </html>
