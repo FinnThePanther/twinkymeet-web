@@ -1,0 +1,640 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getAllAttendees } from '../../lib/db';
+import { verifySessionToken } from '../../lib/auth';
+
+// Authentication check - redirect if not authenticated
+const sessionCookie = Astro.cookies.get('session')?.value;
+const sessionSecret = import.meta.env.SESSION_SECRET || '';
+const isAuthenticated = sessionCookie && verifySessionToken(sessionCookie, sessionSecret);
+
+if (!isAuthenticated) {
+  return Astro.redirect('/admin/login');
+}
+
+// Get all attendees
+const attendees = getAllAttendees();
+
+// Format date helper
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+export const prerender = false;
+---
+
+<AdminLayout title="Manage RSVPs">
+  <!-- Page Header -->
+  <div class="mb-8 flex justify-between items-center">
+    <div>
+      <h2 class="text-3xl font-bold text-gray-900">Manage RSVPs</h2>
+      <p class="text-gray-600 mt-1">Total: {attendees.length} attendee{attendees.length !== 1 ? 's' : ''}</p>
+    </div>
+    <button
+      id="export-csv-button"
+      class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+    >
+      Export to CSV
+    </button>
+  </div>
+
+  <!-- Search and Filter Bar -->
+  <div class="bg-white rounded-lg shadow p-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- Search Input -->
+      <div class="md:col-span-2">
+        <label for="search-input" class="block text-sm font-medium text-gray-700 mb-1">
+          Search
+        </label>
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Search by name or email..."
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+        />
+      </div>
+
+      <!-- Payment Status Filter -->
+      <div>
+        <label for="status-filter" class="block text-sm font-medium text-gray-700 mb-1">
+          Payment Status
+        </label>
+        <select
+          id="status-filter"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+        >
+          <option value="">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="completed">Completed</option>
+          <option value="refunded">Refunded</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- RSVPs Table -->
+  {attendees.length > 0 ? (
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200" id="rsvps-table">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" data-sort="name">
+                Name ↕
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" data-sort="email">
+                Email ↕
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Plus One
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Dietary
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" data-sort="payment_status">
+                Payment ↕
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" data-sort="created_at">
+                Registered ↕
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200" id="rsvps-tbody">
+            {attendees.map((attendee) => (
+              <tr data-attendee-id={attendee.id} data-name={attendee.name.toLowerCase()} data-email={attendee.email.toLowerCase()} data-status={attendee.payment_status}>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {attendee.name}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {attendee.email}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {attendee.plus_one ? (
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Yes
+                    </span>
+                  ) : (
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      No
+                    </span>
+                  )}
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title={attendee.dietary_restrictions || 'None'}>
+                  {attendee.dietary_restrictions || '-'}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  {attendee.payment_status === 'completed' ? (
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Completed
+                    </span>
+                  ) : attendee.payment_status === 'pending' ? (
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                      Pending
+                    </span>
+                  ) : attendee.payment_status === 'refunded' ? (
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      Refunded
+                    </span>
+                  ) : (
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      {attendee.payment_status}
+                    </span>
+                  )}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {attendee.created_at && formatDate(attendee.created_at)}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <button
+                    class="text-indigo-600 hover:text-indigo-900 mr-3 edit-button"
+                    data-attendee-id={attendee.id}
+                    data-attendee-data={JSON.stringify(attendee)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    class="text-red-600 hover:text-red-900 delete-button"
+                    data-attendee-id={attendee.id}
+                    data-attendee-name={attendee.name}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  ) : (
+    <div class="bg-white rounded-lg shadow p-8 text-center">
+      <p class="text-gray-500">No RSVPs yet. Registrations will appear here once attendees sign up.</p>
+    </div>
+  )}
+
+  <!-- Edit Modal -->
+  <div id="edit-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-gray-900">Edit RSVP</h3>
+        <button id="close-edit-modal" class="text-gray-400 hover:text-gray-500">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Error Message -->
+      <div id="edit-error-message" class="hidden mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
+        <p class="text-sm text-red-800" id="edit-error-text"></p>
+      </div>
+
+      <form id="edit-form" class="space-y-4">
+        <input type="hidden" id="edit-attendee-id" />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Name -->
+          <div>
+            <label for="edit-name" class="block text-sm font-medium text-gray-700 mb-1">
+              Name <span class="text-red-600">*</span>
+            </label>
+            <input
+              type="text"
+              id="edit-name"
+              required
+              maxlength="255"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label for="edit-email" class="block text-sm font-medium text-gray-700 mb-1">
+              Email <span class="text-red-600">*</span>
+            </label>
+            <input
+              type="email"
+              id="edit-email"
+              required
+              maxlength="255"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+        </div>
+
+        <!-- Dietary Restrictions -->
+        <div>
+          <label for="edit-dietary" class="block text-sm font-medium text-gray-700 mb-1">
+            Dietary Restrictions
+          </label>
+          <textarea
+            id="edit-dietary"
+            rows="2"
+            maxlength="500"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Plus One -->
+          <div class="flex items-center">
+            <input
+              type="checkbox"
+              id="edit-plus-one"
+              class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            />
+            <label for="edit-plus-one" class="ml-2 text-sm text-gray-700">
+              Plus One
+            </label>
+          </div>
+
+          <!-- Payment Status -->
+          <div>
+            <label for="edit-payment-status" class="block text-sm font-medium text-gray-700 mb-1">
+              Payment Status
+            </label>
+            <select
+              id="edit-payment-status"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+              <option value="refunded">Refunded</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Arrival Time -->
+          <div>
+            <label for="edit-arrival" class="block text-sm font-medium text-gray-700 mb-1">
+              Arrival Time
+            </label>
+            <input
+              type="text"
+              id="edit-arrival"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="e.g., Friday 3pm"
+            />
+          </div>
+
+          <!-- Departure Time -->
+          <div>
+            <label for="edit-departure" class="block text-sm font-medium text-gray-700 mb-1">
+              Departure Time
+            </label>
+            <input
+              type="text"
+              id="edit-departure"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="e.g., Sunday 11am"
+            />
+          </div>
+        </div>
+
+        <!-- Excited About -->
+        <div>
+          <label for="edit-excited" class="block text-sm font-medium text-gray-700 mb-1">
+            What are you excited about?
+          </label>
+          <textarea
+            id="edit-excited"
+            rows="2"
+            maxlength="500"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          ></textarea>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end space-x-3 pt-4">
+          <button
+            type="button"
+            id="cancel-edit-button"
+            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            id="save-edit-button"
+            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div class="mt-3">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Delete RSVP</h3>
+        <p class="text-sm text-gray-500 mb-4">
+          Are you sure you want to delete the RSVP for <strong id="delete-attendee-name"></strong>? This action cannot be undone.
+        </p>
+        <input type="hidden" id="delete-attendee-id" />
+        <div class="flex justify-end space-x-3">
+          <button
+            type="button"
+            id="cancel-delete-button"
+            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            id="confirm-delete-button"
+            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let attendeesData: any[] = [];
+    let sortColumn = 'created_at';
+    let sortDirection = 'desc';
+
+    // Get DOM elements
+    const searchInput = document.getElementById('search-input') as HTMLInputElement;
+    const statusFilter = document.getElementById('status-filter') as HTMLSelectElement;
+    const rsvpsTable = document.getElementById('rsvps-table') as HTMLTableElement;
+    const rsvpsTbody = document.getElementById('rsvps-tbody') as HTMLTableSectionElement;
+    const exportCsvButton = document.getElementById('export-csv-button') as HTMLButtonElement;
+
+    // Edit modal elements
+    const editModal = document.getElementById('edit-modal');
+    const closeEditModalBtn = document.getElementById('close-edit-modal');
+    const cancelEditBtn = document.getElementById('cancel-edit-button');
+    const editForm = document.getElementById('edit-form') as HTMLFormElement;
+    const saveEditBtn = document.getElementById('save-edit-button') as HTMLButtonElement;
+    const editErrorMessage = document.getElementById('edit-error-message');
+    const editErrorText = document.getElementById('edit-error-text');
+
+    // Delete modal elements
+    const deleteModal = document.getElementById('delete-modal');
+    const cancelDeleteBtn = document.getElementById('cancel-delete-button');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-button');
+
+    // Initialize attendees data from table
+    function initializeData() {
+      const rows = rsvpsTbody?.querySelectorAll('tr');
+      attendeesData = Array.from(rows || []).map(row => {
+        const editBtn = row.querySelector('.edit-button') as HTMLButtonElement;
+        return JSON.parse(editBtn.dataset.attendeeData || '{}');
+      });
+    }
+
+    // Search and filter functionality
+    function filterTable() {
+      const searchTerm = searchInput?.value.toLowerCase() || '';
+      const statusValue = statusFilter?.value || '';
+
+      const rows = rsvpsTbody?.querySelectorAll('tr');
+      rows?.forEach((row: Element) => {
+        const htmlRow = row as HTMLElement;
+        const name = htmlRow.dataset.name || '';
+        const email = htmlRow.dataset.email || '';
+        const status = htmlRow.dataset.status || '';
+
+        const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
+        const matchesStatus = !statusValue || status === statusValue;
+
+        if (matchesSearch && matchesStatus) {
+          htmlRow.style.display = '';
+        } else {
+          htmlRow.style.display = 'none';
+        }
+      });
+    }
+
+    // Search input listener
+    searchInput?.addEventListener('input', filterTable);
+    statusFilter?.addEventListener('change', filterTable);
+
+    // Column sorting
+    const sortableHeaders = rsvpsTable?.querySelectorAll('th[data-sort]');
+    sortableHeaders?.forEach(header => {
+      header.addEventListener('click', () => {
+        const column = (header as HTMLElement).dataset.sort;
+        if (!column) return;
+
+        if (sortColumn === column) {
+          sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+          sortColumn = column;
+          sortDirection = 'asc';
+        }
+
+        sortTable(column, sortDirection);
+      });
+    });
+
+    function sortTable(column: string, direction: string) {
+      const rows = Array.from(rsvpsTbody?.querySelectorAll('tr') || []);
+
+      rows.sort((a, b) => {
+        const aData = attendeesData.find(att => att.id === parseInt((a as HTMLElement).dataset.attendeeId || '0'));
+        const bData = attendeesData.find(att => att.id === parseInt((b as HTMLElement).dataset.attendeeId || '0'));
+
+        let aValue = aData?.[column] || '';
+        let bValue = bData?.[column] || '';
+
+        if (column === 'created_at') {
+          aValue = new Date(aValue).getTime();
+          bValue = new Date(bValue).getTime();
+        }
+
+        if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      rows.forEach(row => rsvpsTbody?.appendChild(row));
+    }
+
+    // CSV Export
+    exportCsvButton?.addEventListener('click', () => {
+      const headers = ['Name', 'Email', 'Dietary Restrictions', 'Plus One', 'Arrival Time', 'Departure Time', 'Excited About', 'Payment Status', 'Registered'];
+
+      const csvRows = [headers.join(',')];
+
+      attendeesData.forEach(attendee => {
+        const row = [
+          `"${attendee.name || ''}"`,
+          `"${attendee.email || ''}"`,
+          `"${(attendee.dietary_restrictions || '').replace(/"/g, '""')}"`,
+          attendee.plus_one ? 'Yes' : 'No',
+          `"${attendee.arrival_time || ''}"`,
+          `"${attendee.departure_time || ''}"`,
+          `"${(attendee.excited_about || '').replace(/"/g, '""')}"`,
+          attendee.payment_status || '',
+          attendee.created_at || ''
+        ];
+        csvRows.push(row.join(','));
+      });
+
+      const csvContent = csvRows.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+
+      const today = new Date().toISOString().split('T')[0];
+      link.setAttribute('href', url);
+      link.setAttribute('download', `twinkymeet-rsvps-${today}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    // Edit modal functionality
+    const editButtons = document.querySelectorAll('.edit-button');
+    editButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const attendeeData = JSON.parse((button as HTMLButtonElement).dataset.attendeeData || '{}');
+        openEditModal(attendeeData);
+      });
+    });
+
+    function openEditModal(attendee: any) {
+      (document.getElementById('edit-attendee-id') as HTMLInputElement).value = attendee.id;
+      (document.getElementById('edit-name') as HTMLInputElement).value = attendee.name || '';
+      (document.getElementById('edit-email') as HTMLInputElement).value = attendee.email || '';
+      (document.getElementById('edit-dietary') as HTMLTextAreaElement).value = attendee.dietary_restrictions || '';
+      (document.getElementById('edit-plus-one') as HTMLInputElement).checked = !!attendee.plus_one;
+      (document.getElementById('edit-payment-status') as HTMLSelectElement).value = attendee.payment_status || 'pending';
+      (document.getElementById('edit-arrival') as HTMLInputElement).value = attendee.arrival_time || '';
+      (document.getElementById('edit-departure') as HTMLInputElement).value = attendee.departure_time || '';
+      (document.getElementById('edit-excited') as HTMLTextAreaElement).value = attendee.excited_about || '';
+
+      editModal?.classList.remove('hidden');
+      editErrorMessage?.classList.add('hidden');
+    }
+
+    function closeEditModal() {
+      editModal?.classList.add('hidden');
+      editForm?.reset();
+    }
+
+    closeEditModalBtn?.addEventListener('click', closeEditModal);
+    cancelEditBtn?.addEventListener('click', closeEditModal);
+
+    editForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const attendeeId = (document.getElementById('edit-attendee-id') as HTMLInputElement).value;
+
+      saveEditBtn.disabled = true;
+      saveEditBtn.textContent = 'Saving...';
+      editErrorMessage?.classList.add('hidden');
+
+      const data = {
+        name: (document.getElementById('edit-name') as HTMLInputElement).value,
+        email: (document.getElementById('edit-email') as HTMLInputElement).value,
+        dietary_restrictions: (document.getElementById('edit-dietary') as HTMLTextAreaElement).value,
+        plus_one: (document.getElementById('edit-plus-one') as HTMLInputElement).checked,
+        payment_status: (document.getElementById('edit-payment-status') as HTMLSelectElement).value,
+        arrival_time: (document.getElementById('edit-arrival') as HTMLInputElement).value,
+        departure_time: (document.getElementById('edit-departure') as HTMLInputElement).value,
+        excited_about: (document.getElementById('edit-excited') as HTMLTextAreaElement).value
+      };
+
+      try {
+        const response = await fetch(`/api/admin/rsvps/${attendeeId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          closeEditModal();
+          window.location.reload();
+        } else {
+          if (editErrorText) {
+            editErrorText.textContent = result.error || 'Failed to update RSVP';
+          }
+          editErrorMessage?.classList.remove('hidden');
+        }
+      } catch (error) {
+        if (editErrorText) {
+          editErrorText.textContent = 'Failed to connect to server';
+        }
+        editErrorMessage?.classList.remove('hidden');
+      } finally {
+        saveEditBtn.disabled = false;
+        saveEditBtn.textContent = 'Save Changes';
+      }
+    });
+
+    // Delete modal functionality
+    const deleteButtons = document.querySelectorAll('.delete-button');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const attendeeId = (button as HTMLButtonElement).dataset.attendeeId || '';
+        const attendeeName = (button as HTMLButtonElement).dataset.attendeeName || '';
+        openDeleteModal(attendeeId, attendeeName);
+      });
+    });
+
+    function openDeleteModal(attendeeId: string, attendeeName: string) {
+      (document.getElementById('delete-attendee-id') as HTMLInputElement).value = attendeeId;
+      (document.getElementById('delete-attendee-name') as HTMLElement).textContent = attendeeName;
+      deleteModal?.classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+      deleteModal?.classList.add('hidden');
+    }
+
+    cancelDeleteBtn?.addEventListener('click', closeDeleteModal);
+
+    confirmDeleteBtn?.addEventListener('click', async () => {
+      const attendeeId = (document.getElementById('delete-attendee-id') as HTMLInputElement).value;
+
+      confirmDeleteBtn.disabled = true;
+      confirmDeleteBtn.textContent = 'Deleting...';
+
+      try {
+        const response = await fetch(`/api/admin/rsvps/${attendeeId}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          closeDeleteModal();
+          window.location.reload();
+        } else {
+          alert('Failed to delete RSVP');
+        }
+      } catch (error) {
+        alert('Failed to connect to server');
+      } finally {
+        confirmDeleteBtn.disabled = false;
+        confirmDeleteBtn.textContent = 'Delete';
+      }
+    });
+
+    // Initialize on page load
+    initializeData();
+  </script>
+</AdminLayout>

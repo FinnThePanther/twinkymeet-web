@@ -8,9 +8,7 @@ interface Props {
 
 const { title = 'Admin - TwinkyMeet' } = Astro.props;
 
-// TODO: Phase 4 - Add authentication check here
-// For now, this is a placeholder that allows access
-// In Phase 4, we'll check for session cookie and redirect to /admin/login if not authenticated
+export const prerender = false;
 ---
 
 <!DOCTYPE html>
@@ -40,7 +38,9 @@ const { title = 'Admin - TwinkyMeet' } = Astro.props;
             <h1 class="text-2xl font-semibold text-gray-900">{title}</h1>
             <div class="flex items-center space-x-4">
               <a href="/" class="text-sm text-gray-600 hover:text-gray-900">View Site</a>
-              <a href="/admin/logout" class="text-sm text-red-600 hover:text-red-700">Logout</a>
+              <button id="logout-button" class="text-sm text-red-600 hover:text-red-700 cursor-pointer">
+                Logout
+              </button>
             </div>
           </div>
         </header>
@@ -51,5 +51,27 @@ const { title = 'Admin - TwinkyMeet' } = Astro.props;
         </main>
       </div>
     </div>
+
+    <script>
+      // Handle logout button click
+      const logoutButton = document.getElementById('logout-button');
+      logoutButton?.addEventListener('click', async () => {
+        try {
+          const response = await fetch('/api/admin/logout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          // Redirect to login page regardless of response status
+          window.location.href = '/admin/login';
+        } catch (error) {
+          console.error('Error during logout:', error);
+          // Redirect anyway
+          window.location.href = '/admin/login';
+        }
+      });
+    </script>
   </body>
 </html>

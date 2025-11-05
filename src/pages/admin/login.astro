@@ -1,0 +1,158 @@
+---
+import { parseSessionCookie, verifySessionToken } from '../../lib/auth';
+import '../../styles/global.css';
+
+// Check if already logged in
+const sessionCookie = Astro.cookies.get('session')?.value;
+const sessionSecret = import.meta.env.SESSION_SECRET || '';
+const isAuthenticated = sessionCookie && verifySessionToken(sessionCookie, sessionSecret);
+
+// If already authenticated, redirect to admin dashboard
+if (isAuthenticated) {
+  return Astro.redirect('/admin');
+}
+
+export const prerender = false;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login - TwinkyMeet</title>
+  </head>
+  <body class="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div class="w-full max-w-md">
+      <!-- Logo/Branding -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-indigo-600 mb-2">TwinkyMeet</h1>
+        <p class="text-gray-600">Admin Login</p>
+      </div>
+
+      <!-- Login Form Card -->
+      <div class="bg-white rounded-lg shadow-lg p-8">
+        <!-- Error Message (hidden by default) -->
+        <div id="error-message" class="hidden mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <h3 class="font-semibold text-red-900 mb-1" id="error-title">Error</h3>
+              <p class="text-sm text-red-800" id="error-text"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="space-y-6">
+          <!-- Password Field -->
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+              Admin Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              autocomplete="current-password"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Enter admin password"
+              autofocus
+            />
+          </div>
+
+          <!-- Submit Button -->
+          <div>
+            <button
+              type="submit"
+              id="submit-button"
+              class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              Sign In
+            </button>
+          </div>
+        </form>
+
+        <!-- Back to Home Link -->
+        <div class="mt-6 text-center">
+          <a href="/" class="text-sm text-indigo-600 hover:text-indigo-700 underline">
+            Back to Home
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById('login-form') as HTMLFormElement;
+      const submitButton = document.getElementById('submit-button') as HTMLButtonElement;
+      const errorMessage = document.getElementById('error-message');
+      const errorTitle = document.getElementById('error-title');
+      const errorText = document.getElementById('error-text');
+      const passwordInput = document.getElementById('password') as HTMLInputElement;
+
+      form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Disable button and show loading state
+        submitButton.disabled = true;
+        submitButton.textContent = 'Signing in...';
+
+        // Hide previous error messages
+        errorMessage?.classList.add('hidden');
+
+        // Get password
+        const password = passwordInput.value;
+
+        try {
+          const response = await fetch('/api/admin/auth', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ password })
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            // Success - redirect to admin dashboard
+            window.location.href = '/admin';
+          } else {
+            // Error
+            if (errorTitle && errorText) {
+              if (response.status === 429) {
+                errorTitle.textContent = 'Too Many Attempts';
+                errorText.textContent = result.error || 'You have been temporarily locked out due to too many failed login attempts. Please try again in 15 minutes.';
+              } else if (response.status === 401) {
+                errorTitle.textContent = 'Invalid Password';
+                errorText.textContent = result.error || 'The password you entered is incorrect. Please try again.';
+              } else {
+                errorTitle.textContent = 'Error';
+                errorText.textContent = result.error || 'An error occurred. Please try again.';
+              }
+            }
+            errorMessage?.classList.remove('hidden');
+
+            // Clear password field on error
+            passwordInput.value = '';
+            passwordInput.focus();
+          }
+        } catch (error) {
+          console.error('Error during login:', error);
+          if (errorTitle && errorText) {
+            errorTitle.textContent = 'Connection Error';
+            errorText.textContent = 'Failed to connect to the server. Please check your internet connection and try again.';
+          }
+          errorMessage?.classList.remove('hidden');
+        } finally {
+          // Re-enable button
+          submitButton.disabled = false;
+          submitButton.textContent = 'Sign In';
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -55,6 +55,13 @@ export interface Setting {
   value: string;
 }
 
+export interface LoginAttempt {
+  ip_address: string;
+  attempts: number;
+  last_attempt: string;
+  locked_until?: string;
+}
+
 // Get database path from environment or use default
 const dbPath = process.env.DATABASE_PATH || join(process.cwd(), 'db', 'local.db');
 
@@ -109,6 +116,11 @@ export function insertAttendee(attendee: Attendee): number {
 export function getAttendeeByEmail(email: string): Attendee | undefined {
   const stmt = getDb().prepare('SELECT * FROM attendees WHERE email = ?');
   return stmt.get(email) as Attendee | undefined;
+}
+
+export function getAttendeeById(id: number): Attendee | undefined {
+  const stmt = getDb().prepare('SELECT * FROM attendees WHERE id = ?');
+  return stmt.get(id) as Attendee | undefined;
 }
 
 export function getAllAttendees(): Attendee[] {
@@ -237,4 +249,91 @@ export function getApprovedAndScheduledActivities(): Activity[] {
     ORDER BY title ASC
   `);
   return stmt.all() as Activity[];
+}
+
+// Rate limiting operations for admin login
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+/**
+ * Check if an IP address is currently locked out due to too many failed login attempts
+ */
+export function isIpLocked(ipAddress: string): boolean {
+  const stmt = getDb().prepare(`
+    SELECT locked_until FROM login_attempts
+    WHERE ip_address = ? AND locked_until IS NOT NULL
+  `);
+  const result = stmt.get(ipAddress) as { locked_until: string } | undefined;
+
+  if (!result) {
+    return false;
+  }
+
+  const lockedUntil = new Date(result.locked_until).getTime();
+  const now = Date.now();
+
+  // If still locked, return true
+  if (now < lockedUntil) {
+    return true;
+  }
+
+  // Lock expired, clear it
+  clearLoginAttempts(ipAddress);
+  return false;
+}
+
+/**
+ * Record a failed login attempt for an IP address
+ * Returns true if the IP should now be locked out
+ */
+export function recordFailedLogin(ipAddress: string): boolean {
+  const db = getDb();
+
+  // Get current attempt record
+  const selectStmt = db.prepare('SELECT attempts FROM login_attempts WHERE ip_address = ?');
+  const result = selectStmt.get(ipAddress) as { attempts: number } | undefined;
+
+  const currentAttempts = result ? result.attempts : 0;
+  const newAttempts = currentAttempts + 1;
+
+  if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
+    // Lock the IP
+    const lockedUntil = new Date(Date.now() + LOCKOUT_DURATION).toISOString();
+    const stmt = db.prepare(`
+      INSERT OR REPLACE INTO login_attempts (ip_address, attempts, last_attempt, locked_until)
+      VALUES (?, ?, CURRENT_TIMESTAMP, ?)
+    `);
+    stmt.run(ipAddress, newAttempts, lockedUntil);
+    return true;
+  } else {
+    // Increment attempts
+    const stmt = db.prepare(`
+      INSERT OR REPLACE INTO login_attempts (ip_address, attempts, last_attempt, locked_until)
+      VALUES (?, ?, CURRENT_TIMESTAMP, NULL)
+    `);
+    stmt.run(ipAddress, newAttempts);
+    return false;
+  }
+}
+
+/**
+ * Clear login attempts for an IP address (called on successful login)
+ */
+export function clearLoginAttempts(ipAddress: string): void {
+  const stmt = getDb().prepare('DELETE FROM login_attempts WHERE ip_address = ?');
+  stmt.run(ipAddress);
+}
+
+/**
+ * Get remaining attempts before lockout
+ */
+export function getRemainingAttempts(ipAddress: string): number {
+  const stmt = getDb().prepare('SELECT attempts FROM login_attempts WHERE ip_address = ?');
+  const result = stmt.get(ipAddress) as { attempts: number } | undefined;
+
+  if (!result) {
+    return MAX_LOGIN_ATTEMPTS;
+  }
+
+  return Math.max(0, MAX_LOGIN_ATTEMPTS - result.attempts);
 }

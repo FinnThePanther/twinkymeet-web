@@ -1,0 +1,245 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getDb, getAllAttendees, getAllActivities, getActiveAnnouncements } from '../../lib/db';
+import { verifySessionToken } from '../../lib/auth';
+
+// Authentication check - redirect if not authenticated
+const sessionCookie = Astro.cookies.get('session')?.value;
+const sessionSecret = import.meta.env.SESSION_SECRET || '';
+const isAuthenticated = sessionCookie && verifySessionToken(sessionCookie, sessionSecret);
+
+if (!isAuthenticated) {
+  return Astro.redirect('/admin/login');
+}
+
+// Get statistics
+const db = getDb();
+
+// Count RSVPs
+const rsvpResult = db.prepare('SELECT COUNT(*) as count FROM attendees').get() as { count: number };
+const rsvpCount = rsvpResult.count;
+
+// Count activities by status
+const pendingResult = db.prepare('SELECT COUNT(*) as count FROM activities WHERE status = ?').get('pending') as { count: number };
+const approvedResult = db.prepare('SELECT COUNT(*) as count FROM activities WHERE status = ?').get('approved') as { count: number };
+const scheduledResult = db.prepare('SELECT COUNT(*) as count FROM activities WHERE status = ?').get('scheduled') as { count: number };
+
+const pendingCount = pendingResult.count;
+const approvedCount = approvedResult.count;
+const scheduledCount = scheduledResult.count;
+
+// Get recent RSVPs
+const recentRsvps = db.prepare(`
+  SELECT name, email, created_at
+  FROM attendees
+  ORDER BY created_at DESC
+  LIMIT 5
+`).all() as Array<{ name: string; email: string; created_at: string }>;
+
+// Get active announcements
+const announcements = getActiveAnnouncements();
+
+// Format date helper
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+export const prerender = false;
+---
+
+<AdminLayout title="Dashboard">
+  <!-- Welcome Message -->
+  <div class="mb-8">
+    <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome back!</h2>
+    <p class="text-gray-600">Here's what's happening with TwinkyMeet</p>
+  </div>
+
+  <!-- Active Announcements -->
+  {announcements.length > 0 && (
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Active Announcements</h3>
+      <div class="space-y-3">
+        {announcements.map((announcement) => (
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p class="text-sm text-blue-900">{announcement.message}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <!-- Statistics Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Total RSVPs -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+          <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <div class="ml-5">
+          <p class="text-sm font-medium text-gray-500">Total RSVPs</p>
+          <p class="text-2xl font-semibold text-gray-900">{rsvpCount}</p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <a href="/admin/rsvps" class="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
+          View all →
+        </a>
+      </div>
+    </div>
+
+    <!-- Pending Activities -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
+          <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div class="ml-5">
+          <p class="text-sm font-medium text-gray-500">Pending Activities</p>
+          <p class="text-2xl font-semibold text-gray-900">{pendingCount}</p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <a href="/admin/activities" class="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
+          Review →
+        </a>
+      </div>
+    </div>
+
+    <!-- Approved Activities -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+          <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div class="ml-5">
+          <p class="text-sm font-medium text-gray-500">Approved Activities</p>
+          <p class="text-2xl font-semibold text-gray-900">{approvedCount}</p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <a href="/admin/activities" class="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
+          Manage →
+        </a>
+      </div>
+    </div>
+
+    <!-- Scheduled Activities -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
+          <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div class="ml-5">
+          <p class="text-sm font-medium text-gray-500">Scheduled Activities</p>
+          <p class="text-2xl font-semibold text-gray-900">{scheduledCount}</p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <a href="/schedule" class="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
+          View schedule →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="mb-8">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <a
+        href="/admin/rsvps"
+        class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
+      >
+        <h4 class="font-semibold text-gray-900 mb-2">Manage RSVPs</h4>
+        <p class="text-sm text-gray-600">View, edit, and export attendee registrations</p>
+      </a>
+
+      <a
+        href="/admin/activities"
+        class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow relative"
+      >
+        <h4 class="font-semibold text-gray-900 mb-2">Manage Activities</h4>
+        <p class="text-sm text-gray-600">Approve and schedule activity submissions</p>
+        {pendingCount > 0 && (
+          <span class="absolute top-4 right-4 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+            {pendingCount}
+          </span>
+        )}
+      </a>
+
+      <a
+        href="/admin/settings"
+        class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
+      >
+        <h4 class="font-semibold text-gray-900 mb-2">Settings</h4>
+        <p class="text-sm text-gray-600">Configure event details and feature toggles</p>
+      </a>
+    </div>
+  </div>
+
+  <!-- Recent RSVPs -->
+  {recentRsvps.length > 0 && (
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent RSVPs</h3>
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Name
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Email
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Registered
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {recentRsvps.map((rsvp) => (
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {rsvp.name}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {rsvp.email}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {formatDate(rsvp.created_at)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div class="bg-gray-50 px-6 py-3">
+          <a href="/admin/rsvps" class="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
+            View all RSVPs →
+          </a>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {recentRsvps.length === 0 && (
+    <div class="bg-white rounded-lg shadow p-8 text-center">
+      <p class="text-gray-500">No RSVPs yet. Share the event link to start collecting registrations!</p>
+    </div>
+  )}
+</AdminLayout>

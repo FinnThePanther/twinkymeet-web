@@ -57,6 +57,14 @@ CREATE TABLE IF NOT EXISTS settings (
   value TEXT NOT NULL
 );
 
+-- Login attempts table: Track failed login attempts for rate limiting
+CREATE TABLE IF NOT EXISTS login_attempts (
+  ip_address TEXT PRIMARY KEY,
+  attempts INTEGER DEFAULT 0,
+  last_attempt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  locked_until DATETIME
+);
+
 -- Insert initial settings data
 INSERT OR IGNORE INTO settings (key, value) VALUES
   ('event_date_start', '2026-07-01'),
