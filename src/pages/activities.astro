@@ -6,8 +6,12 @@ import { getApprovedAndScheduledActivities } from '../lib/db';
 // Fetch all approved and scheduled activities
 const activities = getApprovedAndScheduledActivities();
 
-// Get unique activity types for filter buttons
+// Get unique activity types for filter buttons and count activities per type
 const activityTypes = [...new Set(activities.map(a => a.activity_type).filter(Boolean))];
+const typeCounts: Record<string, number> = {};
+activityTypes.forEach(type => {
+  typeCounts[type || ''] = activities.filter(a => a.activity_type === type).length;
+});
 ---
 
 <BaseLayout title="Activities - TwinkyMeet" description="Browse all activities and events planned for TwinkyMeet">
@@ -22,20 +26,32 @@ const activityTypes = [...new Set(activities.map(a => a.activity_type).filter(Bo
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-      <!-- Activity Type Filter Placeholders (non-functional for now - Phase 7) -->
+      <!-- Activity Type Filter -->
       {activityTypes.length > 0 && (
         <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
           <div class="flex flex-wrap gap-3 items-center">
             <span class="text-sm font-medium text-gray-700">Filter by type:</span>
-            <button class="px-4 py-2 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
+            <button
+              class="type-filter px-4 py-2 text-sm text-white rounded-md transition-colors font-medium"
+              style="background-color: #4f46e5;"
+              data-type="all"
+            >
               All
+              <span class="ml-1.5 px-2 py-0.5 bg-white bg-opacity-30 rounded-full text-xs">
+                {activities.length}
+              </span>
             </button>
             {activityTypes.map(type => (
-              <button class="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors capitalize">
+              <button
+                class="type-filter px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors capitalize"
+                data-type={type}
+              >
                 {type}
+                <span class="ml-1.5 px-2 py-0.5 bg-gray-100 rounded-full text-xs text-gray-700">
+                  {typeCounts[type || '']}
+                </span>
               </button>
             ))}
-            <span class="text-xs text-gray-500 ml-auto">(Filters coming soon)</span>
           </div>
         </div>
       )}
@@ -44,7 +60,7 @@ const activityTypes = [...new Set(activities.map(a => a.activity_type).filter(Bo
       {activities.length > 0 && (
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div class="bg-white rounded-lg shadow-sm p-6 text-center">
-            <div class="text-3xl font-bold text-indigo-600 mb-1">{activities.length}</div>
+            <div class="text-3xl font-bold text-indigo-600 mb-1" id="total-count">{activities.length}</div>
             <div class="text-sm text-gray-600">Total Activities</div>
           </div>
           <div class="bg-white rounded-lg shadow-sm p-6 text-center">
@@ -73,16 +89,43 @@ const activityTypes = [...new Set(activities.map(a => a.activity_type).filter(Bo
           </p>
           <a
             href="/submit-activity"
-            class="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+            class="inline-block text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            style="background-color: #4f46e5;"
           >
             Propose an Activity
           </a>
         </div>
       ) : (
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {activities.map(activity => (
-            <ActivityCard activity={activity} />
-          ))}
+        <div>
+          <div id="activities-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activities.map(activity => (
+              <div
+                class="activity-item"
+                data-type={activity.activity_type || ''}
+                data-status={activity.status}
+              >
+                <ActivityCard activity={activity} />
+              </div>
+            ))}
+          </div>
+
+          <!-- No Results Message -->
+          <div id="no-results" class="hidden bg-white rounded-lg shadow-sm p-12 text-center">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">No Activities Found</h3>
+            <p class="text-gray-600 mb-4">
+              No activities match the selected type. Try selecting a different category.
+            </p>
+            <button
+              id="reset-filter"
+              class="text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              style="background-color: #4f46e5;"
+            >
+              Show All Activities
+            </button>
+          </div>
         </div>
       )}
 
@@ -134,4 +177,101 @@ const activityTypes = [...new Set(activities.map(a => a.activity_type).filter(Bo
 
     </div>
   </div>
+
+  <script>
+    // Filter state
+    let selectedType = 'all';
+
+    // Get elements
+    const typeFilters = document.querySelectorAll('.type-filter');
+    const activitiesGrid = document.getElementById('activities-grid');
+    const noResults = document.getElementById('no-results');
+    const resetButton = document.getElementById('reset-filter');
+    const totalCountDisplay = document.getElementById('total-count');
+
+    // Filter activities
+    function filterActivities() {
+      const activityItems = document.querySelectorAll('.activity-item');
+      let visibleCount = 0;
+
+      activityItems.forEach(item => {
+        const htmlItem = item as HTMLElement;
+        const itemType = htmlItem.dataset.type || '';
+
+        if (selectedType === 'all' || itemType === selectedType) {
+          htmlItem.style.display = '';
+          visibleCount++;
+        } else {
+          htmlItem.style.display = 'none';
+        }
+      });
+
+      // Update total count display
+      if (totalCountDisplay) {
+        totalCountDisplay.textContent = visibleCount.toString();
+      }
+
+      // Show/hide no results message
+      if (activitiesGrid && noResults) {
+        if (visibleCount === 0) {
+          activitiesGrid.style.display = 'none';
+          noResults.classList.remove('hidden');
+        } else {
+          activitiesGrid.style.display = '';
+          noResults.classList.add('hidden');
+        }
+      }
+    }
+
+    // Update button states
+    function updateButtonStates() {
+      typeFilters.forEach(btn => {
+        const htmlBtn = btn as HTMLElement;
+        if (htmlBtn.dataset.type === selectedType) {
+          htmlBtn.style.backgroundColor = '#4f46e5';
+          htmlBtn.style.color = 'white';
+          htmlBtn.style.borderColor = '#4f46e5';
+
+          // Update badge styling for active button
+          const badge = htmlBtn.querySelector('span');
+          if (badge) {
+            badge.classList.remove('bg-gray-100', 'text-gray-700');
+            badge.classList.add('bg-white', 'bg-opacity-30', 'text-white');
+            (badge as HTMLElement).style.color = 'white';
+            (badge as HTMLElement).style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+          }
+        } else {
+          htmlBtn.style.backgroundColor = '';
+          htmlBtn.style.color = '';
+          htmlBtn.style.borderColor = '';
+
+          // Reset badge styling for inactive buttons
+          const badge = htmlBtn.querySelector('span');
+          if (badge) {
+            badge.classList.remove('bg-white', 'bg-opacity-30', 'text-white');
+            badge.classList.add('bg-gray-100', 'text-gray-700');
+            (badge as HTMLElement).style.color = '';
+            (badge as HTMLElement).style.backgroundColor = '';
+          }
+        }
+      });
+    }
+
+    // Type filter handlers
+    typeFilters.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const htmlBtn = btn as HTMLElement;
+        selectedType = htmlBtn.dataset.type || 'all';
+        updateButtonStates();
+        filterActivities();
+      });
+    });
+
+    // Reset filter
+    resetButton?.addEventListener('click', () => {
+      selectedType = 'all';
+      updateButtonStates();
+      filterActivities();
+    });
+  </script>
 </BaseLayout>
