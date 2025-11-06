@@ -1,11 +1,13 @@
 ---
 import type { Activity } from '../lib/db';
+import { Image } from 'astro:assets';
 
 interface Props {
   activity: Activity;
+  image?: ImageMetadata;
 }
 
-const { activity } = Astro.props;
+const { activity, image } = Astro.props;
 
 // Format time to display
 const formatTime = (datetime?: string) => {
@@ -17,24 +19,28 @@ const formatTime = (datetime?: string) => {
   });
 };
 
-// Badge color based on activity type
-const getBadgeColor = (type?: string) => {
-  const colors: Record<string, string> = {
-    gaming: 'bg-purple-100 text-purple-800',
-    outdoor: 'bg-green-100 text-green-800',
-    creative: 'bg-pink-100 text-pink-800',
-    social: 'bg-blue-100 text-blue-800',
-    '18+': 'bg-red-100 text-red-800',
-  };
-  return colors[type || ''] || 'bg-gray-100 text-gray-800';
-};
+// Use teal for all badges
+const getBadgeColor = () => 'bg-primary-100 text-primary-800';
 ---
 
-<div class="bg-white border-l-4 border-indigo-500 shadow-sm rounded-r-lg p-4 hover:shadow-md transition-shadow">
+<div class="bg-white border-l-4 border-primary-500 shadow-sm rounded-r-lg p-4 hover:shadow-md transition-shadow">
+  <!-- Optional Thumbnail -->
+  {image && (
+    <div class="float-right ml-4 mb-2 w-20 h-20 rounded overflow-hidden flex-shrink-0">
+      <Image
+        src={image}
+        alt={activity.title}
+        class="w-full h-full object-cover"
+        widths={[80, 160]}
+        sizes="80px"
+      />
+    </div>
+  )}
+
   <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
     <!-- Time & Location -->
     <div class="flex-shrink-0 md:w-48">
-      <div class="text-lg font-semibold text-indigo-600">
+      <div class="text-lg font-semibold text-primary-600">
         {formatTime(activity.scheduled_start)} - {formatTime(activity.scheduled_end)}
       </div>
       {activity.location && (
@@ -52,7 +58,7 @@ const getBadgeColor = (type?: string) => {
       <div class="flex items-start justify-between gap-2 mb-2">
         <h3 class="text-lg font-semibold text-gray-900">{activity.title}</h3>
         {activity.activity_type && (
-          <span class={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getBadgeColor(activity.activity_type)}`}>
+          <span class={`px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getBadgeColor()}`}>
             {activity.activity_type}
           </span>
         )}

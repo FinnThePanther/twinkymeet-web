@@ -16,7 +16,7 @@ const navLinks = [
     <div class="flex justify-between items-center h-16">
       <!-- Logo/Site Name -->
       <div class="flex-shrink-0">
-        <a href="/" class="text-2xl font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
+        <a href="/" class="text-2xl font-bold text-primary-600 hover:text-accent-600 transition-colors">
           TwinkyMeet
         </a>
       </div>
@@ -28,8 +28,8 @@ const navLinks = [
             href={link.href}
             class={`inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors ${
               currentPath === link.href
-                ? 'text-indigo-600 border-b-2 border-indigo-600'
-                : 'text-gray-700 hover:text-indigo-600 hover:border-gray-300'
+                ? 'text-primary-600 border-b-2 border-primary-600'
+                : 'text-gray-700 hover:text-accent-600 hover:border-gray-300'
             }`}
           >
             {link.label}
@@ -42,7 +42,7 @@ const navLinks = [
         <button
           type="button"
           id="mobile-menu-button"
-          class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-indigo-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+          class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
           aria-controls="mobile-menu"
           aria-expanded="false"
         >
@@ -63,8 +63,8 @@ const navLinks = [
             href={link.href}
             class={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors ${
               currentPath === link.href
-                ? 'bg-indigo-50 border-indigo-600 text-indigo-600'
-                : 'border-transparent text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:text-indigo-600'
+                ? 'bg-primary-50 border-primary-600 text-primary-600'
+                : 'border-transparent text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:text-accent-600'
             }`}
           >
             {link.label}

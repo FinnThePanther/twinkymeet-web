@@ -1,11 +1,13 @@
 ---
 import type { Activity } from '../lib/db';
+import { Image } from 'astro:assets';
 
 interface Props {
   activity: Activity;
+  image?: ImageMetadata;
 }
 
-const { activity } = Astro.props;
+const { activity, image } = Astro.props;
 
 // Format duration
 const formatDuration = (minutes?: number) => {
@@ -16,28 +18,54 @@ const formatDuration = (minutes?: number) => {
   return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
 };
 
-// Badge color based on activity type
-const getBadgeColor = (type?: string) => {
-  const colors: Record<string, string> = {
-    gaming: 'bg-purple-100 text-purple-800',
-    outdoor: 'bg-green-100 text-green-800',
-    creative: 'bg-pink-100 text-pink-800',
-    social: 'bg-blue-100 text-blue-800',
-    '18+': 'bg-red-100 text-red-800',
-  };
-  return colors[type || ''] || 'bg-gray-100 text-gray-800';
+// Use teal badges for all activity types
+const getBadgeColor = () => 'bg-primary-100 text-primary-800';
+
+// Status badge color
+const getStatusColor = (status: string) => {
+  if (status === 'scheduled') return 'bg-accent-100 text-accent-800';
+  return 'bg-yellow-100 text-yellow-800';
 };
 ---
 
-<div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+<div class="bg-white rounded-lg overflow-hidden hover-lift" style="box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.1);">
+  <!-- Activity Image (if provided) -->
+  {image && (
+    <div class="w-full h-48 overflow-hidden image-zoom">
+      <Image
+        src={image}
+        alt={activity.title}
+        class="w-full h-full object-cover"
+        widths={[400, 800]}
+        sizes="(max-width: 768px) 100vw, 400px"
+      />
+    </div>
+  )}
+
+  <!-- Card Content -->
+  <div class="p-6">
   <!-- Header -->
   <div class="flex justify-between items-start mb-3">
-    <h3 class="text-xl font-semibold text-gray-900">{activity.title}</h3>
-    {activity.activity_type && (
-      <span class={`px-3 py-1 text-xs font-semibold rounded-full ${getBadgeColor(activity.activity_type)}`}>
-        {activity.activity_type}
-      </span>
-    )}
+    <h3 class="text-xl font-semibold text-gray-900 flex-1">{activity.title}</h3>
+    <div class="flex flex-col gap-2 ml-2">
+      {activity.activity_type && (
+        <span class={`px-3 py-1 text-xs font-semibold rounded-full text-center ${getBadgeColor()}`}>
+          {activity.activity_type}
+        </span>
+      )}
+      {activity.status === 'scheduled' && (
+        <span class={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(activity.status)} flex items-center justify-center gap-1`}>
+          <span class="w-2 h-2 bg-accent-600 rounded-full"></span>
+          Scheduled
+        </span>
+      )}
+      {activity.status === 'approved' && (
+        <span class={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(activity.status)} flex items-center justify-center gap-1`}>
+          <span class="w-2 h-2 bg-yellow-600 rounded-full"></span>
+          Time TBA
+        </span>
+      )}
+    </div>
   </div>
 
   <!-- Description -->
@@ -90,4 +118,5 @@ const getBadgeColor = (type?: string) => {
       </p>
     </div>
   )}
+  </div>
 </div>

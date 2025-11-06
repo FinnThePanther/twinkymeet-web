@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ImageHero from '../components/ImageHero.astro';
 import ScheduleItem from '../components/ScheduleItem.astro';
 import { getScheduledActivities } from '../lib/db';
 
@@ -38,30 +39,37 @@ const currentActivity = activities.find(a => {
 const upcomingActivities = activities
   .filter(a => a.scheduled_start && new Date(a.scheduled_start) > now)
   .slice(0, 3);
+
+// Try to import hero image
+let heroImage;
+try {
+  heroImage = await import('../images/hero/schedule-hero.jpg');
+} catch {
+  heroImage = undefined;
+}
 ---
 
 <BaseLayout title="Schedule - TwinkyMeet" description="View the complete schedule of activities and events">
   <div class="bg-gray-50 min-h-screen">
-    <!-- Header Section -->
-    <section class="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white py-12">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 class="text-4xl md:text-5xl font-bold mb-4">Event Schedule</h1>
-        <p class="text-xl text-indigo-100">Check out what's planned for TwinkyMeet</p>
-      </div>
-    </section>
+    <!-- Hero Section -->
+    <ImageHero
+      image={heroImage?.default}
+      title="Event Schedule"
+      subtitle="Check out what's planned for TwinkyMeet"
+    />
 
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
       <!-- What's Happening Now Section -->
       {(currentActivity || upcomingActivities.length > 0) && (
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6 border-l-4 border-indigo-600">
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6 border-l-4 border-primary-600">
           {currentActivity ? (
             <div>
               <div class="flex items-center mb-2">
-                <span class="inline-block w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                <span class="inline-block w-3 h-3 bg-accent-500 rounded-full mr-2 animate-pulse"></span>
                 <h3 class="text-lg font-bold text-gray-900">Happening Now</h3>
               </div>
-              <p class="text-2xl font-semibold text-indigo-600 mb-1">{currentActivity.title}</p>
+              <p class="text-2xl font-semibold text-primary-600 mb-1">{currentActivity.title}</p>
               <p class="text-gray-600">
                 {currentActivity.location} • Ends at {new Date(currentActivity.scheduled_end!).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
               </p>
@@ -72,7 +80,7 @@ const upcomingActivities = activities
               <div class="space-y-2">
                 {upcomingActivities.map(activity => (
                   <div class="flex items-center text-sm">
-                    <span class="font-medium text-indigo-600 w-20">
+                    <span class="font-medium text-primary-600 w-20">
                       {new Date(activity.scheduled_start!).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
                     </span>
                     <span class="text-gray-900">{activity.title}</span>
@@ -95,7 +103,7 @@ const upcomingActivities = activities
             <button
               class="day-filter px-4 py-2 text-sm border rounded-md transition-colors font-medium"
               data-day="all"
-              style="background-color: #2563eb; color: white; border-color: #2563eb;"
+              style="background-color: #0891b2; color: white; border-color: #0891b2;"
             >
               All Days
             </button>
@@ -175,14 +183,14 @@ const upcomingActivities = activities
           <div class="flex justify-center gap-4">
             <a
               href="/submit-activity"
-              class="inline-block text-white px-6 py-2 rounded-lg font-medium transition-colors"
-              style="background-color: #4f46e5;"
+              class="inline-block text-white px-6 py-2 rounded-lg font-bold transition-all shadow-lg hover:shadow-xl hover-lift"
+              style="background-color: #fb923c;"
             >
               Suggest an Activity
             </a>
             <a
               href="/activities"
-              class="inline-block bg-white text-indigo-600 px-6 py-2 rounded-lg font-medium border-2 border-indigo-600 hover:bg-indigo-50 transition-colors"
+              class="inline-block bg-white text-primary-700 px-6 py-2 rounded-lg font-bold border-2 border-primary-600 hover:bg-primary-50 transition-colors"
             >
               View All Activities
             </a>
@@ -193,9 +201,9 @@ const upcomingActivities = activities
         <div id="schedule-container" class="space-y-8">
           {days.map(day => (
             <div class="day-section" data-day={day}>
-              <div class="flex items-center mb-4">
-                <h2 class="text-2xl font-bold text-gray-900">{day}</h2>
-                <div class="ml-4 flex-1 h-px bg-gray-300"></div>
+              <div class="flex items-center mb-6">
+                <h2 class="text-2xl md:text-3xl font-bold text-primary-700">{day}</h2>
+                <div class="ml-4 flex-1 h-1 bg-gradient-to-r from-primary-400 to-transparent rounded"></div>
               </div>
               <div class="space-y-4">
                 {groupedByDay[day].map(activity => (
@@ -225,8 +233,8 @@ const upcomingActivities = activities
         </p>
         <button
           id="reset-filters-2"
-          class="text-white px-6 py-2 rounded-lg font-medium transition-colors"
-          style="background-color: #4f46e5;"
+          class="text-white px-6 py-2 rounded-lg font-bold transition-all shadow-lg hover-lift"
+          style="background-color: #0891b2;"
         >
           Reset Filters
         </button>
@@ -234,9 +242,9 @@ const upcomingActivities = activities
 
       <!-- Info Box -->
       {activities.length > 0 && (
-        <div class="mt-8 bg-indigo-50 border border-indigo-200 rounded-lg p-6">
+        <div class="mt-8 bg-primary-50 border border-primary-200 rounded-lg p-6">
           <div class="flex">
-            <svg class="w-6 h-6 text-indigo-600 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="w-6 h-6 text-primary-600 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
@@ -245,7 +253,7 @@ const upcomingActivities = activities
                 <li>• All times are subject to change. Check back for updates!</li>
                 <li>• Participation is entirely optional – join what interests you</li>
                 <li>• Some activities may have capacity limits</li>
-                <li>• Want to host something? <a href="/submit-activity" class="text-indigo-600 hover:text-indigo-700 underline">Submit an activity</a></li>
+                <li>• Want to host something? <a href="/submit-activity" class="text-accent-600 hover:text-accent-700 font-semibold underline">Submit an activity</a></li>
               </ul>
             </div>
           </div>
@@ -257,7 +265,7 @@ const upcomingActivities = activities
         <div class="text-center mt-8">
           <a
             href="/activities"
-            class="inline-flex items-center text-indigo-600 hover:text-indigo-700 font-medium"
+            class="inline-flex items-center text-accent-600 hover:text-accent-700 font-bold text-lg"
           >
             View detailed activity catalog
             <svg class="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -346,9 +354,9 @@ const upcomingActivities = activities
       dayFilters.forEach(btn => {
         const htmlBtn = btn as HTMLElement;
         if (htmlBtn.dataset.day === selectedDay) {
-          htmlBtn.style.backgroundColor = '#2563eb';
+          htmlBtn.style.backgroundColor = '#0891b2';
           htmlBtn.style.color = 'white';
-          htmlBtn.style.borderColor = '#2563eb';
+          htmlBtn.style.borderColor = '#0891b2';
         } else {
           htmlBtn.style.backgroundColor = '';
           htmlBtn.style.color = '';
@@ -360,9 +368,9 @@ const upcomingActivities = activities
       timeFilters.forEach(btn => {
         const htmlBtn = btn as HTMLElement;
         if (htmlBtn.dataset.time === selectedTime) {
-          htmlBtn.style.backgroundColor = '#2563eb';
+          htmlBtn.style.backgroundColor = '#0891b2';
           htmlBtn.style.color = 'white';
-          htmlBtn.style.borderColor = '#2563eb';
+          htmlBtn.style.borderColor = '#0891b2';
         } else {
           htmlBtn.style.backgroundColor = '';
           htmlBtn.style.color = '';
@@ -374,9 +382,9 @@ const upcomingActivities = activities
       typeFilters.forEach(btn => {
         const htmlBtn = btn as HTMLElement;
         if (htmlBtn.dataset.type === selectedType) {
-          htmlBtn.style.backgroundColor = '#2563eb';
+          htmlBtn.style.backgroundColor = '#0891b2';
           htmlBtn.style.color = 'white';
-          htmlBtn.style.borderColor = '#2563eb';
+          htmlBtn.style.borderColor = '#0891b2';
         } else {
           htmlBtn.style.backgroundColor = '';
           htmlBtn.style.color = '';

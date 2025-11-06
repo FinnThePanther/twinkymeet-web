@@ -1,0 +1,59 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  image: ImageMetadata;
+  caption?: string;
+  aspectRatio?: 'square' | 'landscape' | 'portrait';
+  showCaptionOnHover?: boolean;
+}
+
+const {
+  image,
+  caption,
+  aspectRatio = 'landscape',
+  showCaptionOnHover = false
+} = Astro.props;
+
+const aspectRatioClass = {
+  square: 'aspect-square',
+  landscape: 'aspect-video',
+  portrait: 'aspect-[3/4]'
+}[aspectRatio];
+---
+
+<div class="photo-card group relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 image-zoom">
+  <!-- Photo -->
+  <div class={`w-full ${aspectRatioClass} overflow-hidden bg-gray-200`}>
+    <Image
+      src={image}
+      alt={caption || 'TwinkyMeet photo'}
+      class="w-full h-full object-cover"
+      widths={[400, 800]}
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+    />
+  </div>
+
+  <!-- Caption -->
+  {caption && (
+    <div
+      class={`absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent transition-opacity duration-300 ${
+        showCaptionOnHover ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'
+      }`}
+    >
+      <p class="text-white text-sm md:text-base font-medium drop-shadow-lg">
+        {caption}
+      </p>
+    </div>
+  )}
+</div>
+
+<style>
+  .photo-card img {
+    transition: transform 0.3s ease;
+  }
+
+  .photo-card:hover img {
+    transform: scale(1.05);
+  }
+</style>
