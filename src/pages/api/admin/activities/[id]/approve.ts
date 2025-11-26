@@ -11,13 +11,13 @@ export const PATCH: APIRoute = async ({ params }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Invalid activity ID'
+          error: 'Invalid activity ID',
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -28,13 +28,13 @@ export const PATCH: APIRoute = async ({ params }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Activity not found'
+          error: 'Activity not found',
         }),
         {
           status: 404,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -47,13 +47,13 @@ export const PATCH: APIRoute = async ({ params }) => {
     return new Response(
       JSON.stringify({
         success: true,
-        activity: updatedActivity
+        activity: updatedActivity,
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   } catch (error) {
@@ -61,13 +61,13 @@ export const PATCH: APIRoute = async ({ params }) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to approve activity'
+        error: 'Failed to approve activity',
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   }

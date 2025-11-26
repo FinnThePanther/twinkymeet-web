@@ -5,7 +5,8 @@ import '../../styles/global.css';
 // Check if already logged in
 const sessionCookie = Astro.cookies.get('session')?.value;
 const sessionSecret = import.meta.env.SESSION_SECRET || '';
-const isAuthenticated = sessionCookie && verifySessionToken(sessionCookie, sessionSecret);
+const isAuthenticated =
+  sessionCookie && verifySessionToken(sessionCookie, sessionSecret);
 
 // If already authenticated, redirect to admin dashboard
 if (isAuthenticated) {
@@ -15,31 +16,45 @@ if (isAuthenticated) {
 export const prerender = false;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Login - TwinkyMeet</title>
   </head>
-  <body class="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+  <body class="flex min-h-screen items-center justify-center bg-gray-50 px-4">
     <div class="w-full max-w-md">
       <!-- Logo/Branding -->
-      <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-indigo-600 mb-2">TwinkyMeet</h1>
+      <div class="mb-8 text-center">
+        <h1 class="mb-2 text-4xl font-bold text-indigo-600">TwinkyMeet</h1>
         <p class="text-gray-600">Admin Login</p>
       </div>
 
       <!-- Login Form Card -->
-      <div class="bg-white rounded-lg shadow-lg p-8">
+      <div class="rounded-lg bg-white p-8 shadow-lg">
         <!-- Error Message (hidden by default) -->
-        <div id="error-message" class="hidden mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+        <div
+          id="error-message"
+          class="mb-6 hidden rounded-lg border border-red-200 bg-red-50 p-4"
+        >
           <div class="flex items-start">
-            <svg class="w-5 h-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              class="mt-0.5 mr-2 h-5 w-5 flex-shrink-0 text-red-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <div>
-              <h3 class="font-semibold text-red-900 mb-1" id="error-title">Error</h3>
+              <h3 class="mb-1 font-semibold text-red-900" id="error-title">
+                Error
+              </h3>
               <p class="text-sm text-red-800" id="error-text"></p>
             </div>
           </div>
@@ -49,7 +64,10 @@ export const prerender = false;
         <form id="login-form" class="space-y-6">
           <!-- Password Field -->
           <div>
-            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              for="password"
+              class="mb-1 block text-sm font-medium text-gray-700"
+            >
               Admin Password
             </label>
             <input
@@ -58,7 +76,7 @@ export const prerender = false;
               name="password"
               required
               autocomplete="current-password"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
               placeholder="Enter admin password"
               autofocus
             />
@@ -69,7 +87,7 @@ export const prerender = false;
             <button
               type="submit"
               id="submit-button"
-              class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              class="w-full rounded-lg bg-indigo-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-400"
             >
               Sign In
             </button>
@@ -78,7 +96,10 @@ export const prerender = false;
 
         <!-- Back to Home Link -->
         <div class="mt-6 text-center">
-          <a href="/" class="text-sm text-indigo-600 hover:text-indigo-700 underline">
+          <a
+            href="/"
+            class="text-sm text-indigo-600 underline hover:text-indigo-700"
+          >
             Back to Home
           </a>
         </div>
@@ -87,11 +108,15 @@ export const prerender = false;
 
     <script>
       const form = document.getElementById('login-form') as HTMLFormElement;
-      const submitButton = document.getElementById('submit-button') as HTMLButtonElement;
+      const submitButton = document.getElementById(
+        'submit-button'
+      ) as HTMLButtonElement;
       const errorMessage = document.getElementById('error-message');
       const errorTitle = document.getElementById('error-title');
       const errorText = document.getElementById('error-text');
-      const passwordInput = document.getElementById('password') as HTMLInputElement;
+      const passwordInput = document.getElementById(
+        'password'
+      ) as HTMLInputElement;
 
       form?.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -110,9 +135,9 @@ export const prerender = false;
           const response = await fetch('/api/admin/auth', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ password })
+            body: JSON.stringify({ password }),
           });
 
           const result = await response.json();
@@ -125,13 +150,18 @@ export const prerender = false;
             if (errorTitle && errorText) {
               if (response.status === 429) {
                 errorTitle.textContent = 'Too Many Attempts';
-                errorText.textContent = result.error || 'You have been temporarily locked out due to too many failed login attempts. Please try again in 15 minutes.';
+                errorText.textContent =
+                  result.error ||
+                  'You have been temporarily locked out due to too many failed login attempts. Please try again in 15 minutes.';
               } else if (response.status === 401) {
                 errorTitle.textContent = 'Invalid Password';
-                errorText.textContent = result.error || 'The password you entered is incorrect. Please try again.';
+                errorText.textContent =
+                  result.error ||
+                  'The password you entered is incorrect. Please try again.';
               } else {
                 errorTitle.textContent = 'Error';
-                errorText.textContent = result.error || 'An error occurred. Please try again.';
+                errorText.textContent =
+                  result.error || 'An error occurred. Please try again.';
               }
             }
             errorMessage?.classList.remove('hidden');
@@ -144,7 +174,8 @@ export const prerender = false;
           console.error('Error during login:', error);
           if (errorTitle && errorText) {
             errorTitle.textContent = 'Connection Error';
-            errorText.textContent = 'Failed to connect to the server. Please check your internet connection and try again.';
+            errorText.textContent =
+              'Failed to connect to the server. Please check your internet connection and try again.';
           }
           errorMessage?.classList.remove('hidden');
         } finally {

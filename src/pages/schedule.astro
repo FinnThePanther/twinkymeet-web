@@ -9,10 +9,14 @@ const activities = getScheduledActivities();
 
 // Group activities by day
 const groupedByDay: Record<string, typeof activities> = {};
-activities.forEach(activity => {
+activities.forEach((activity) => {
   if (activity.scheduled_start) {
     const date = new Date(activity.scheduled_start);
-    const dayKey = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    const dayKey = date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+    });
     if (!groupedByDay[dayKey]) {
       groupedByDay[dayKey] = [];
     }
@@ -23,11 +27,13 @@ activities.forEach(activity => {
 const days = Object.keys(groupedByDay);
 
 // Extract unique activity types
-const activityTypes = Array.from(new Set(activities.map(a => a.activity_type).filter(Boolean)));
+const activityTypes = Array.from(
+  new Set(activities.map((a) => a.activity_type).filter(Boolean))
+);
 
 // Get current date/time for "What's Happening Now"
 const now = new Date();
-const currentActivity = activities.find(a => {
+const currentActivity = activities.find((a) => {
   if (a.scheduled_start && a.scheduled_end) {
     const start = new Date(a.scheduled_start);
     const end = new Date(a.scheduled_end);
@@ -37,7 +43,7 @@ const currentActivity = activities.find(a => {
 });
 
 const upcomingActivities = activities
-  .filter(a => a.scheduled_start && new Date(a.scheduled_start) > now)
+  .filter((a) => a.scheduled_start && new Date(a.scheduled_start) > now)
   .slice(0, 3);
 
 // Try to import hero image
@@ -49,8 +55,11 @@ try {
 }
 ---
 
-<BaseLayout title="Schedule - TwinkyMeet" description="View the complete schedule of activities and events">
-  <div class="bg-gray-50 min-h-screen">
+<BaseLayout
+  title="Schedule - TwinkyMeet"
+  description="View the complete schedule of activities and events"
+>
+  <div class="min-h-screen bg-gray-50">
     <!-- Hero Section -->
     <ImageHero
       image={heroImage?.default}
@@ -58,87 +67,110 @@ try {
       subtitle="Check out what's planned for TwinkyMeet"
     />
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
+    <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       <!-- What's Happening Now Section -->
-      {(currentActivity || upcomingActivities.length > 0) && (
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6 border-l-4 border-primary-600">
-          {currentActivity ? (
-            <div>
-              <div class="flex items-center mb-2">
-                <span class="inline-block w-3 h-3 bg-accent-500 rounded-full mr-2 animate-pulse"></span>
-                <h3 class="text-lg font-bold text-gray-900">Happening Now</h3>
+      {
+        (currentActivity || upcomingActivities.length > 0) && (
+          <div class="border-primary-600 mb-6 rounded-lg border-l-4 bg-white p-6 shadow-sm">
+            {currentActivity ? (
+              <div>
+                <div class="mb-2 flex items-center">
+                  <span class="bg-accent-500 mr-2 inline-block h-3 w-3 animate-pulse rounded-full" />
+                  <h3 class="text-lg font-bold text-gray-900">Happening Now</h3>
+                </div>
+                <p class="text-primary-600 mb-1 text-2xl font-semibold">
+                  {currentActivity.title}
+                </p>
+                <p class="text-gray-600">
+                  {currentActivity.location} • Ends at{' '}
+                  {new Date(currentActivity.scheduled_end!).toLocaleTimeString(
+                    'en-US',
+                    {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                    }
+                  )}
+                </p>
               </div>
-              <p class="text-2xl font-semibold text-primary-600 mb-1">{currentActivity.title}</p>
-              <p class="text-gray-600">
-                {currentActivity.location} • Ends at {new Date(currentActivity.scheduled_end!).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
-              </p>
-            </div>
-          ) : upcomingActivities.length > 0 && (
-            <div>
-              <h3 class="text-lg font-bold text-gray-900 mb-3">Coming Up Next</h3>
-              <div class="space-y-2">
-                {upcomingActivities.map(activity => (
-                  <div class="flex items-center text-sm">
-                    <span class="font-medium text-primary-600 w-20">
-                      {new Date(activity.scheduled_start!).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
-                    </span>
-                    <span class="text-gray-900">{activity.title}</span>
-                    <span class="text-gray-500 ml-2">@ {activity.location}</span>
+            ) : (
+              upcomingActivities.length > 0 && (
+                <div>
+                  <h3 class="mb-3 text-lg font-bold text-gray-900">
+                    Coming Up Next
+                  </h3>
+                  <div class="space-y-2">
+                    {upcomingActivities.map((activity) => (
+                      <div class="flex items-center text-sm">
+                        <span class="text-primary-600 w-20 font-medium">
+                          {new Date(
+                            activity.scheduled_start!
+                          ).toLocaleTimeString('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                        <span class="text-gray-900">{activity.title}</span>
+                        <span class="ml-2 text-gray-500">
+                          @ {activity.location}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+                </div>
+              )
+            )}
+          </div>
+        )
+      }
 
       <!-- Filters -->
-      <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
-        <div class="flex flex-wrap gap-3 items-center">
+      <div class="mb-6 rounded-lg bg-white p-4 shadow-sm">
+        <div class="flex flex-wrap items-center gap-3">
           <span class="text-sm font-medium text-gray-700">Filter by:</span>
 
           <!-- Day Filter -->
           <div class="flex flex-wrap gap-2">
             <button
-              class="day-filter px-4 py-2 text-sm border rounded-md transition-colors font-medium"
+              class="day-filter rounded-md border px-4 py-2 text-sm font-medium transition-colors"
               data-day="all"
               style="background-color: #0891b2; color: white; border-color: #0891b2;"
             >
               All Days
             </button>
-            {days.map(day => (
-              <button
-                class="day-filter px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                data-day={day}
-              >
-                {day.split(',')[0]}
-              </button>
-            ))}
+            {
+              days.map((day) => (
+                <button
+                  class="day-filter rounded-md border border-gray-300 px-4 py-2 text-sm transition-colors hover:bg-gray-50"
+                  data-day={day}
+                >
+                  {day.split(',')[0]}
+                </button>
+              ))
+            }
           </div>
 
           <!-- Time of Day Filter -->
-          <div class="border-l border-gray-300 pl-3 ml-2 flex flex-wrap gap-2">
+          <div class="ml-2 flex flex-wrap gap-2 border-l border-gray-300 pl-3">
             <button
-              class="time-filter px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              class="time-filter rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:bg-gray-50"
               data-time="morning"
             >
               Morning
             </button>
             <button
-              class="time-filter px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              class="time-filter rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:bg-gray-50"
               data-time="afternoon"
             >
               Afternoon
             </button>
             <button
-              class="time-filter px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              class="time-filter rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:bg-gray-50"
               data-time="evening"
             >
               Evening
             </button>
             <button
-              class="time-filter px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              class="time-filter rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:bg-gray-50"
               data-time="night"
             >
               Late Night
@@ -146,23 +178,25 @@ try {
           </div>
 
           <!-- Activity Type Filter -->
-          {activityTypes.length > 0 && (
-            <div class="border-l border-gray-300 pl-3 ml-2 flex flex-wrap gap-2">
-              {activityTypes.map(type => (
-                <button
-                  class="type-filter px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                  data-type={type}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
-          )}
+          {
+            activityTypes.length > 0 && (
+              <div class="ml-2 flex flex-wrap gap-2 border-l border-gray-300 pl-3">
+                {activityTypes.map((type) => (
+                  <button
+                    class="type-filter rounded-md border border-gray-300 px-3 py-2 text-sm transition-colors hover:bg-gray-50"
+                    data-type={type}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            )
+          }
 
           <!-- Reset Filters -->
           <button
             id="reset-filters"
-            class="ml-auto px-4 py-2 text-sm text-gray-600 hover:text-gray-900 underline"
+            class="ml-auto px-4 py-2 text-sm text-gray-600 underline hover:text-gray-900"
           >
             Reset Filters
           </button>
@@ -170,70 +204,103 @@ try {
       </div>
 
       <!-- Schedule Content -->
-      {activities.length === 0 ? (
-        <!-- Empty State -->
-        <div class="bg-white rounded-lg shadow-sm p-12 text-center">
-          <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">No Activities Scheduled Yet</h3>
-          <p class="text-gray-600 mb-6">
-            The schedule is being finalized. Check back soon or propose your own activity!
-          </p>
-          <div class="flex justify-center gap-4">
-            <a
-              href="/submit-activity"
-              class="inline-block text-white px-6 py-2 rounded-lg font-bold transition-all shadow-lg hover:shadow-xl hover-lift"
-              style="background-color: #fb923c;"
+      {
+        activities.length === 0 ? (
+          <div class="rounded-lg bg-white p-12 text-center shadow-sm">
+            <svg
+              class="mx-auto mb-4 h-16 w-16 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              Suggest an Activity
-            </a>
-            <a
-              href="/activities"
-              class="inline-block bg-white text-primary-700 px-6 py-2 rounded-lg font-bold border-2 border-primary-600 hover:bg-primary-50 transition-colors"
-            >
-              View All Activities
-            </a>
-          </div>
-        </div>
-      ) : (
-        <!-- Activities grouped by day -->
-        <div id="schedule-container" class="space-y-8">
-          {days.map(day => (
-            <div class="day-section" data-day={day}>
-              <div class="flex items-center mb-6">
-                <h2 class="text-2xl md:text-3xl font-bold text-primary-700">{day}</h2>
-                <div class="ml-4 flex-1 h-1 bg-gradient-to-r from-primary-400 to-transparent rounded"></div>
-              </div>
-              <div class="space-y-4">
-                {groupedByDay[day].map(activity => (
-                  <div
-                    class="activity-item"
-                    data-day={day}
-                    data-time={activity.scheduled_start ? new Date(activity.scheduled_start).getHours() : ''}
-                    data-type={activity.activity_type || ''}
-                  >
-                    <ScheduleItem activity={activity} />
-                  </div>
-                ))}
-              </div>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            <h3 class="mb-2 text-lg font-semibold text-gray-900">
+              No Activities Scheduled Yet
+            </h3>
+            <p class="mb-6 text-gray-600">
+              The schedule is being finalized. Check back soon or propose your
+              own activity!
+            </p>
+            <div class="flex justify-center gap-4">
+              <a
+                href="/submit-activity"
+                class="hover-lift inline-block rounded-lg px-6 py-2 font-bold text-white shadow-lg transition-all hover:shadow-xl"
+                style="background-color: #fb923c;"
+              >
+                Suggest an Activity
+              </a>
+              <a
+                href="/activities"
+                class="text-primary-700 border-primary-600 hover:bg-primary-50 inline-block rounded-lg border-2 bg-white px-6 py-2 font-bold transition-colors"
+              >
+                View All Activities
+              </a>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        ) : (
+          <div id="schedule-container" class="space-y-8">
+            {days.map((day) => (
+              <div class="day-section" data-day={day}>
+                <div class="mb-6 flex items-center">
+                  <h2 class="text-primary-700 text-2xl font-bold md:text-3xl">
+                    {day}
+                  </h2>
+                  <div class="from-primary-400 ml-4 h-1 flex-1 rounded bg-gradient-to-r to-transparent" />
+                </div>
+                <div class="space-y-4">
+                  {groupedByDay[day].map((activity) => (
+                    <div
+                      class="activity-item"
+                      data-day={day}
+                      data-time={
+                        activity.scheduled_start
+                          ? new Date(activity.scheduled_start).getHours()
+                          : ''
+                      }
+                      data-type={activity.activity_type || ''}
+                    >
+                      <ScheduleItem activity={activity} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+      }
 
       <!-- No Results Message -->
-      <div id="no-results" class="hidden bg-white rounded-lg shadow-sm p-12 text-center">
-        <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      <div
+        id="no-results"
+        class="hidden rounded-lg bg-white p-12 text-center shadow-sm"
+      >
+        <svg
+          class="mx-auto mb-4 h-16 w-16 text-gray-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
-        <h3 class="text-lg font-semibold text-gray-900 mb-2">No Activities Match Your Filters</h3>
-        <p class="text-gray-600 mb-4">
+        <h3 class="mb-2 text-lg font-semibold text-gray-900">
+          No Activities Match Your Filters
+        </h3>
+        <p class="mb-4 text-gray-600">
           Try adjusting your filters to see more activities.
         </p>
         <button
           id="reset-filters-2"
-          class="text-white px-6 py-2 rounded-lg font-bold transition-all shadow-lg hover-lift"
+          class="hover-lift rounded-lg px-6 py-2 font-bold text-white shadow-lg transition-all"
           style="background-color: #0891b2;"
         >
           Reset Filters
@@ -241,40 +308,76 @@ try {
       </div>
 
       <!-- Info Box -->
-      {activities.length > 0 && (
-        <div class="mt-8 bg-primary-50 border border-primary-200 rounded-lg p-6">
-          <div class="flex">
-            <svg class="w-6 h-6 text-primary-600 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div>
-              <h3 class="font-semibold text-gray-900 mb-1">Schedule Notes</h3>
-              <ul class="text-sm text-gray-700 space-y-1">
-                <li>• All times are subject to change. Check back for updates!</li>
-                <li>• Participation is entirely optional – join what interests you</li>
-                <li>• Some activities may have capacity limits</li>
-                <li>• Want to host something? <a href="/submit-activity" class="text-accent-600 hover:text-accent-700 font-semibold underline">Submit an activity</a></li>
-              </ul>
+      {
+        activities.length > 0 && (
+          <div class="bg-primary-50 border-primary-200 mt-8 rounded-lg border p-6">
+            <div class="flex">
+              <svg
+                class="text-primary-600 mr-3 h-6 w-6 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <div>
+                <h3 class="mb-1 font-semibold text-gray-900">Schedule Notes</h3>
+                <ul class="space-y-1 text-sm text-gray-700">
+                  <li>
+                    • All times are subject to change. Check back for updates!
+                  </li>
+                  <li>
+                    • Participation is entirely optional – join what interests
+                    you
+                  </li>
+                  <li>• Some activities may have capacity limits</li>
+                  <li>
+                    • Want to host something?{' '}
+                    <a
+                      href="/submit-activity"
+                      class="text-accent-600 hover:text-accent-700 font-semibold underline"
+                    >
+                      Submit an activity
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       <!-- View All Activities Link -->
-      {activities.length > 0 && (
-        <div class="text-center mt-8">
-          <a
-            href="/activities"
-            class="inline-flex items-center text-accent-600 hover:text-accent-700 font-bold text-lg"
-          >
-            View detailed activity catalog
-            <svg class="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </a>
-        </div>
-      )}
-
+      {
+        activities.length > 0 && (
+          <div class="mt-8 text-center">
+            <a
+              href="/activities"
+              class="text-accent-600 hover:text-accent-700 inline-flex items-center text-lg font-bold"
+            >
+              View detailed activity catalog
+              <svg
+                class="ml-2 h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+            </a>
+          </div>
+        )
+      }
     </div>
   </div>
 
@@ -288,7 +391,9 @@ try {
     const dayFilters = document.querySelectorAll('.day-filter');
     const timeFilters = document.querySelectorAll('.time-filter');
     const typeFilters = document.querySelectorAll('.type-filter');
-    const resetButtons = document.querySelectorAll('#reset-filters, #reset-filters-2');
+    const resetButtons = document.querySelectorAll(
+      '#reset-filters, #reset-filters-2'
+    );
     const scheduleContainer = document.getElementById('schedule-container');
     const noResults = document.getElementById('no-results');
 
@@ -307,19 +412,20 @@ try {
       let visibleCount = 0;
 
       // First, hide all day sections
-      daySections.forEach(section => {
+      daySections.forEach((section) => {
         (section as HTMLElement).style.display = 'none';
       });
 
       // Filter activity items
-      activityItems.forEach(item => {
+      activityItems.forEach((item) => {
         const htmlItem = item as HTMLElement;
         const itemDay = htmlItem.dataset.day || '';
         const itemTimeHour = parseInt(htmlItem.dataset.time || '0');
         const itemType = htmlItem.dataset.type || '';
 
         const matchesDay = selectedDay === 'all' || itemDay === selectedDay;
-        const matchesTime = !selectedTime || getTimeOfDay(itemTimeHour) === selectedTime;
+        const matchesTime =
+          !selectedTime || getTimeOfDay(itemTimeHour) === selectedTime;
         const matchesType = !selectedType || itemType === selectedType;
 
         if (matchesDay && matchesTime && matchesType) {
@@ -351,7 +457,7 @@ try {
     // Update button states
     function updateButtonStates() {
       // Day filters
-      dayFilters.forEach(btn => {
+      dayFilters.forEach((btn) => {
         const htmlBtn = btn as HTMLElement;
         if (htmlBtn.dataset.day === selectedDay) {
           htmlBtn.style.backgroundColor = '#0891b2';
@@ -365,7 +471,7 @@ try {
       });
 
       // Time filters
-      timeFilters.forEach(btn => {
+      timeFilters.forEach((btn) => {
         const htmlBtn = btn as HTMLElement;
         if (htmlBtn.dataset.time === selectedTime) {
           htmlBtn.style.backgroundColor = '#0891b2';
@@ -379,7 +485,7 @@ try {
       });
 
       // Type filters
-      typeFilters.forEach(btn => {
+      typeFilters.forEach((btn) => {
         const htmlBtn = btn as HTMLElement;
         if (htmlBtn.dataset.type === selectedType) {
           htmlBtn.style.backgroundColor = '#0891b2';
@@ -394,7 +500,7 @@ try {
     }
 
     // Day filter handlers
-    dayFilters.forEach(btn => {
+    dayFilters.forEach((btn) => {
       btn.addEventListener('click', () => {
         const htmlBtn = btn as HTMLElement;
         selectedDay = htmlBtn.dataset.day || 'all';
@@ -404,7 +510,7 @@ try {
     });
 
     // Time filter handlers
-    timeFilters.forEach(btn => {
+    timeFilters.forEach((btn) => {
       btn.addEventListener('click', () => {
         const htmlBtn = btn as HTMLElement;
         const time = htmlBtn.dataset.time || null;
@@ -415,7 +521,7 @@ try {
     });
 
     // Type filter handlers
-    typeFilters.forEach(btn => {
+    typeFilters.forEach((btn) => {
       btn.addEventListener('click', () => {
         const htmlBtn = btn as HTMLElement;
         const type = htmlBtn.dataset.type || null;
@@ -426,7 +532,7 @@ try {
     });
 
     // Reset filters
-    resetButtons.forEach(btn => {
+    resetButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
         selectedDay = 'all';
         selectedTime = null;

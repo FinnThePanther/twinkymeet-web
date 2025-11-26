@@ -11,13 +11,13 @@ export const PATCH: APIRoute = async ({ params, request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Invalid activity ID'
+          error: 'Invalid activity ID',
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -28,13 +28,13 @@ export const PATCH: APIRoute = async ({ params, request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Activity not found'
+          error: 'Activity not found',
         }),
         {
           status: 404,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -71,7 +71,11 @@ export const PATCH: APIRoute = async ({ params, request }) => {
       }
     }
 
-    if (!location || typeof location !== 'string' || location.trim().length === 0) {
+    if (
+      !location ||
+      typeof location !== 'string' ||
+      location.trim().length === 0
+    ) {
       errors.location = 'Location is required';
     } else if (location.length > 255) {
       errors.location = 'Location must be 255 characters or less';
@@ -82,13 +86,13 @@ export const PATCH: APIRoute = async ({ params, request }) => {
         JSON.stringify({
           success: false,
           error: 'Validation failed',
-          details: errors
+          details: errors,
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -98,7 +102,7 @@ export const PATCH: APIRoute = async ({ params, request }) => {
       scheduled_start,
       scheduled_end,
       location: location.trim(),
-      status: 'scheduled'
+      status: 'scheduled',
     });
 
     const updatedActivity = getActivityById(id);
@@ -106,13 +110,13 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     return new Response(
       JSON.stringify({
         success: true,
-        activity: updatedActivity
+        activity: updatedActivity,
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   } catch (error) {
@@ -120,13 +124,13 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to schedule activity'
+        error: 'Failed to schedule activity',
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   }

@@ -9,19 +9,21 @@ export const GET: APIRoute = async ({ url }) => {
     const status = url.searchParams.get('status');
 
     const activities = status
-      ? getAllActivities(status as 'pending' | 'approved' | 'scheduled' | 'cancelled')
+      ? getAllActivities(
+          status as 'pending' | 'approved' | 'scheduled' | 'cancelled'
+        )
       : getAllActivities();
 
     return new Response(
       JSON.stringify({
         success: true,
-        activities
+        activities,
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   } catch (error) {
@@ -29,13 +31,13 @@ export const GET: APIRoute = async ({ url }) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to fetch activities'
+        error: 'Failed to fetch activities',
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   }

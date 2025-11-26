@@ -19,11 +19,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Unauthorized. Please login to access this resource.'
+          error: 'Unauthorized. Please login to access this resource.',
         }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
         }
       );
     }

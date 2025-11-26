@@ -1,5 +1,9 @@
 import type { APIRoute } from 'astro';
-import { getAttendeeById, updateAttendee, deleteAttendee } from '../../../../lib/db';
+import {
+  getAttendeeById,
+  updateAttendee,
+  deleteAttendee,
+} from '../../../../lib/db';
 
 export const prerender = false;
 
@@ -11,11 +15,11 @@ export const GET: APIRoute = async ({ params }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Invalid attendee ID'
+          error: 'Invalid attendee ID',
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
         }
       );
     }
@@ -26,11 +30,11 @@ export const GET: APIRoute = async ({ params }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Attendee not found'
+          error: 'Attendee not found',
         }),
         {
           status: 404,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
         }
       );
     }
@@ -38,11 +42,11 @@ export const GET: APIRoute = async ({ params }) => {
     return new Response(
       JSON.stringify({
         success: true,
-        attendee
+        attendee,
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       }
     );
   } catch (error) {
@@ -50,11 +54,11 @@ export const GET: APIRoute = async ({ params }) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to fetch attendee'
+        error: 'Failed to fetch attendee',
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       }
     );
   }
@@ -68,11 +72,11 @@ export const PUT: APIRoute = async ({ params, request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Invalid attendee ID'
+          error: 'Invalid attendee ID',
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
         }
       );
     }
@@ -83,11 +87,11 @@ export const PUT: APIRoute = async ({ params, request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Attendee not found'
+          error: 'Attendee not found',
         }),
         {
           status: 404,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
         }
       );
     }
@@ -102,7 +106,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
       arrival_time,
       departure_time,
       excited_about,
-      payment_status
+      payment_status,
     } = body;
 
     // Validate required fields
@@ -128,11 +132,20 @@ export const PUT: APIRoute = async ({ params, request }) => {
     }
 
     // Validate optional fields if provided
-    if (dietary_restrictions !== undefined && dietary_restrictions && dietary_restrictions.length > 500) {
-      errors.dietary_restrictions = 'Dietary restrictions must be less than 500 characters';
+    if (
+      dietary_restrictions !== undefined &&
+      dietary_restrictions &&
+      dietary_restrictions.length > 500
+    ) {
+      errors.dietary_restrictions =
+        'Dietary restrictions must be less than 500 characters';
     }
 
-    if (excited_about !== undefined && excited_about && excited_about.length > 500) {
+    if (
+      excited_about !== undefined &&
+      excited_about &&
+      excited_about.length > 500
+    ) {
       errors.excited_about = 'Response must be less than 500 characters';
     }
 
@@ -148,11 +161,11 @@ export const PUT: APIRoute = async ({ params, request }) => {
         JSON.stringify({
           success: false,
           error: 'Validation failed',
-          details: errors
+          details: errors,
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
         }
       );
     }
@@ -161,11 +174,15 @@ export const PUT: APIRoute = async ({ params, request }) => {
     const updates: Record<string, any> = {};
     if (name !== undefined) updates.name = name.trim();
     if (email !== undefined) updates.email = email.trim().toLowerCase();
-    if (dietary_restrictions !== undefined) updates.dietary_restrictions = dietary_restrictions?.trim() || null;
+    if (dietary_restrictions !== undefined)
+      updates.dietary_restrictions = dietary_restrictions?.trim() || null;
     if (plus_one !== undefined) updates.plus_one = plus_one ? 1 : 0;
-    if (arrival_time !== undefined) updates.arrival_time = arrival_time?.trim() || null;
-    if (departure_time !== undefined) updates.departure_time = departure_time?.trim() || null;
-    if (excited_about !== undefined) updates.excited_about = excited_about?.trim() || null;
+    if (arrival_time !== undefined)
+      updates.arrival_time = arrival_time?.trim() || null;
+    if (departure_time !== undefined)
+      updates.departure_time = departure_time?.trim() || null;
+    if (excited_about !== undefined)
+      updates.excited_about = excited_about?.trim() || null;
     if (payment_status !== undefined) updates.payment_status = payment_status;
 
     // Update attendee
@@ -178,11 +195,11 @@ export const PUT: APIRoute = async ({ params, request }) => {
       JSON.stringify({
         success: true,
         message: 'Attendee updated successfully',
-        attendee: updatedAttendee
+        attendee: updatedAttendee,
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       }
     );
   } catch (error) {
@@ -190,11 +207,11 @@ export const PUT: APIRoute = async ({ params, request }) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to update attendee'
+        error: 'Failed to update attendee',
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       }
     );
   }
@@ -208,11 +225,11 @@ export const DELETE: APIRoute = async ({ params }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Invalid attendee ID'
+          error: 'Invalid attendee ID',
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
         }
       );
     }
@@ -223,11 +240,11 @@ export const DELETE: APIRoute = async ({ params }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Attendee not found'
+          error: 'Attendee not found',
         }),
         {
           status: 404,
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
         }
       );
     }
@@ -238,11 +255,11 @@ export const DELETE: APIRoute = async ({ params }) => {
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Attendee deleted successfully'
+        message: 'Attendee deleted successfully',
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       }
     );
   } catch (error) {
@@ -250,11 +267,11 @@ export const DELETE: APIRoute = async ({ params }) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to delete attendee'
+        error: 'Failed to delete attendee',
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       }
     );
   }

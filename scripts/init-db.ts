@@ -30,7 +30,9 @@ try {
   console.log('✓ Schema applied');
 
   // Verify tables were created
-  const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
+  const tables = db
+    .prepare("SELECT name FROM sqlite_master WHERE type='table'")
+    .all();
   console.log('\nCreated tables:');
   tables.forEach((table: any) => {
     console.log('  -', table.name);

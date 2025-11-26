@@ -10,7 +10,9 @@ const SALT_ROUNDS = 12;
 async function generateHash(password: string) {
   if (!password) {
     console.error('Error: Password is required');
-    console.error('Usage: pnpm tsx scripts/generate-password-hash.ts "your-password"');
+    console.error(
+      'Usage: pnpm tsx scripts/generate-password-hash.ts "your-password"'
+    );
     process.exit(1);
   }
 
@@ -40,7 +42,9 @@ const password = process.argv[2];
 
 if (!password) {
   console.error('Error: Password is required');
-  console.error('Usage: pnpm tsx scripts/generate-password-hash.ts "your-password"');
+  console.error(
+    'Usage: pnpm tsx scripts/generate-password-hash.ts "your-password"'
+  );
   process.exit(1);
 }
 

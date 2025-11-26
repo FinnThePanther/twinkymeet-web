@@ -12,14 +12,14 @@ export const POST: APIRoute = async () => {
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Logged out successfully'
+        message: 'Logged out successfully',
       }),
       {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
-          'Set-Cookie': cookieHeader
-        }
+          'Set-Cookie': cookieHeader,
+        },
       }
     );
   } catch (error) {
@@ -30,14 +30,14 @@ export const POST: APIRoute = async () => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'An error occurred during logout'
+        error: 'An error occurred during logout',
       }),
       {
         status: 500,
         headers: {
           'Content-Type': 'application/json',
-          'Set-Cookie': cookieHeader
-        }
+          'Set-Cookie': cookieHeader,
+        },
       }
     );
   }

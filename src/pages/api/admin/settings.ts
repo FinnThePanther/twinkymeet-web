@@ -9,20 +9,20 @@ export const GET: APIRoute = async () => {
 
     // Convert array of settings to object for easier access
     const settingsObj: Record<string, string> = {};
-    settings.forEach(setting => {
+    settings.forEach((setting) => {
       settingsObj[setting.key] = setting.value;
     });
 
     return new Response(
       JSON.stringify({
         success: true,
-        settings: settingsObj
+        settings: settingsObj,
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   } catch (error) {
@@ -30,13 +30,13 @@ export const GET: APIRoute = async () => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to fetch settings'
+        error: 'Failed to fetch settings',
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   }
@@ -50,7 +50,7 @@ export const PUT: APIRoute = async ({ request }) => {
       event_date_end,
       location,
       rsvp_open,
-      activity_submissions_open
+      activity_submissions_open,
     } = body;
 
     const errors: Record<string, string> = {};
@@ -77,7 +77,11 @@ export const PUT: APIRoute = async ({ request }) => {
         }
 
         // Validate end is after start
-        if (event_date_start && !errors.event_date_start && !errors.event_date_end) {
+        if (
+          event_date_start &&
+          !errors.event_date_start &&
+          !errors.event_date_end
+        ) {
           const startDate = new Date(event_date_start);
           if (endDate < startDate) {
             errors.event_date_end = 'Event end date must be after start date';
@@ -88,7 +92,11 @@ export const PUT: APIRoute = async ({ request }) => {
 
     // Validate location
     if (location !== undefined) {
-      if (!location || typeof location !== 'string' || location.trim().length === 0) {
+      if (
+        !location ||
+        typeof location !== 'string' ||
+        location.trim().length === 0
+      ) {
         errors.location = 'Location is required';
       } else if (location.length > 255) {
         errors.location = 'Location must be 255 characters or less';
@@ -97,14 +105,23 @@ export const PUT: APIRoute = async ({ request }) => {
 
     // Validate boolean toggles
     if (rsvp_open !== undefined) {
-      if (typeof rsvp_open !== 'boolean' && rsvp_open !== 'true' && rsvp_open !== 'false') {
+      if (
+        typeof rsvp_open !== 'boolean' &&
+        rsvp_open !== 'true' &&
+        rsvp_open !== 'false'
+      ) {
         errors.rsvp_open = 'RSVP open must be a boolean value';
       }
     }
 
     if (activity_submissions_open !== undefined) {
-      if (typeof activity_submissions_open !== 'boolean' && activity_submissions_open !== 'true' && activity_submissions_open !== 'false') {
-        errors.activity_submissions_open = 'Activity submissions open must be a boolean value';
+      if (
+        typeof activity_submissions_open !== 'boolean' &&
+        activity_submissions_open !== 'true' &&
+        activity_submissions_open !== 'false'
+      ) {
+        errors.activity_submissions_open =
+          'Activity submissions open must be a boolean value';
       }
     }
 
@@ -113,13 +130,13 @@ export const PUT: APIRoute = async ({ request }) => {
         JSON.stringify({
           success: false,
           error: 'Validation failed',
-          details: errors
+          details: errors,
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -138,34 +155,36 @@ export const PUT: APIRoute = async ({ request }) => {
     }
 
     if (rsvp_open !== undefined) {
-      const value = typeof rsvp_open === 'boolean' ? rsvp_open.toString() : rsvp_open;
+      const value =
+        typeof rsvp_open === 'boolean' ? rsvp_open.toString() : rsvp_open;
       setSetting('rsvp_open', value);
     }
 
     if (activity_submissions_open !== undefined) {
-      const value = typeof activity_submissions_open === 'boolean'
-        ? activity_submissions_open.toString()
-        : activity_submissions_open;
+      const value =
+        typeof activity_submissions_open === 'boolean'
+          ? activity_submissions_open.toString()
+          : activity_submissions_open;
       setSetting('activity_submissions_open', value);
     }
 
     // Fetch updated settings
     const settings = getAllSettings();
     const settingsObj: Record<string, string> = {};
-    settings.forEach(setting => {
+    settings.forEach((setting) => {
       settingsObj[setting.key] = setting.value;
     });
 
     return new Response(
       JSON.stringify({
         success: true,
-        settings: settingsObj
+        settings: settingsObj,
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   } catch (error) {
@@ -173,13 +192,13 @@ export const PUT: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to update settings'
+        error: 'Failed to update settings',
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   }

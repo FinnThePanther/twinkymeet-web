@@ -11,11 +11,11 @@ interface Props {
 
 const {
   title = 'TwinkyMeet - Summer Mini-Convention',
-  description = 'A summer mini-convention for a close-knit furry community gathering'
+  description = 'A summer mini-convention for a close-knit furry community gathering',
 } = Astro.props;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -25,10 +25,10 @@ const {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
   </head>
-  <body class="min-h-screen flex flex-col bg-gray-50">
+  <body class="flex min-h-screen flex-col bg-gray-50">
     <Header />
     <AnnouncementBanner />
-    <main class="flex-1 relative z-10">
+    <main class="relative z-10 flex-1">
       <slot />
     </main>
     <div class="relative z-10">

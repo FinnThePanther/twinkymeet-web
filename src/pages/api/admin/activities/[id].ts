@@ -1,5 +1,9 @@
 import type { APIRoute } from 'astro';
-import { getActivityById, updateActivity, deleteActivity } from '../../../../lib/db';
+import {
+  getActivityById,
+  updateActivity,
+  deleteActivity,
+} from '../../../../lib/db';
 
 export const prerender = false;
 
@@ -11,13 +15,13 @@ export const GET: APIRoute = async ({ params }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Invalid activity ID'
+          error: 'Invalid activity ID',
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -28,13 +32,13 @@ export const GET: APIRoute = async ({ params }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Activity not found'
+          error: 'Activity not found',
         }),
         {
           status: 404,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -42,13 +46,13 @@ export const GET: APIRoute = async ({ params }) => {
     return new Response(
       JSON.stringify({
         success: true,
-        activity
+        activity,
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   } catch (error) {
@@ -56,13 +60,13 @@ export const GET: APIRoute = async ({ params }) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to fetch activity'
+        error: 'Failed to fetch activity',
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   }
@@ -76,13 +80,13 @@ export const PUT: APIRoute = async ({ params, request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Invalid activity ID'
+          error: 'Invalid activity ID',
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -93,13 +97,13 @@ export const PUT: APIRoute = async ({ params, request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Activity not found'
+          error: 'Activity not found',
         }),
         {
           status: 404,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -119,7 +123,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
       status,
       scheduled_start,
       scheduled_end,
-      location
+      location,
     } = body;
 
     // Validate fields
@@ -134,13 +138,21 @@ export const PUT: APIRoute = async ({ params, request }) => {
     }
 
     if (description !== undefined) {
-      if (description && typeof description === 'string' && description.length > 2000) {
+      if (
+        description &&
+        typeof description === 'string' &&
+        description.length > 2000
+      ) {
         errors.description = 'Description must be 2000 characters or less';
       }
     }
 
     if (host_name !== undefined) {
-      if (!host_name || typeof host_name !== 'string' || host_name.trim().length === 0) {
+      if (
+        !host_name ||
+        typeof host_name !== 'string' ||
+        host_name.trim().length === 0
+      ) {
         errors.host_name = 'Host name is required';
       } else if (host_name.trim().length > 255) {
         errors.host_name = 'Host name must be 255 characters or less';
@@ -148,7 +160,11 @@ export const PUT: APIRoute = async ({ params, request }) => {
     }
 
     if (host_email !== undefined) {
-      if (!host_email || typeof host_email !== 'string' || host_email.trim().length === 0) {
+      if (
+        !host_email ||
+        typeof host_email !== 'string' ||
+        host_email.trim().length === 0
+      ) {
         errors.host_email = 'Host email is required';
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(host_email)) {
         errors.host_email = 'Invalid email format';
@@ -158,20 +174,34 @@ export const PUT: APIRoute = async ({ params, request }) => {
     }
 
     if (duration !== undefined) {
-      if (duration === null || duration === undefined || typeof duration !== 'number' || duration <= 0) {
+      if (
+        duration === null ||
+        duration === undefined ||
+        typeof duration !== 'number' ||
+        duration <= 0
+      ) {
         errors.duration = 'Duration must be a positive number';
       }
     }
 
     if (activity_type !== undefined) {
-      if (activity_type && typeof activity_type === 'string' && activity_type.length > 100) {
+      if (
+        activity_type &&
+        typeof activity_type === 'string' &&
+        activity_type.length > 100
+      ) {
         errors.activity_type = 'Activity type must be 100 characters or less';
       }
     }
 
     if (equipment_needed !== undefined) {
-      if (equipment_needed && typeof equipment_needed === 'string' && equipment_needed.length > 500) {
-        errors.equipment_needed = 'Equipment needed must be 500 characters or less';
+      if (
+        equipment_needed &&
+        typeof equipment_needed === 'string' &&
+        equipment_needed.length > 500
+      ) {
+        errors.equipment_needed =
+          'Equipment needed must be 500 characters or less';
       }
     }
 
@@ -182,8 +212,13 @@ export const PUT: APIRoute = async ({ params, request }) => {
     }
 
     if (time_preference !== undefined) {
-      if (time_preference && typeof time_preference === 'string' && time_preference.length > 500) {
-        errors.time_preference = 'Time preference must be 500 characters or less';
+      if (
+        time_preference &&
+        typeof time_preference === 'string' &&
+        time_preference.length > 500
+      ) {
+        errors.time_preference =
+          'Time preference must be 500 characters or less';
       }
     }
 
@@ -233,13 +268,13 @@ export const PUT: APIRoute = async ({ params, request }) => {
         JSON.stringify({
           success: false,
           error: 'Validation failed',
-          details: errors
+          details: errors,
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -247,19 +282,27 @@ export const PUT: APIRoute = async ({ params, request }) => {
     // Build updates object
     const updates: Record<string, any> = {};
     if (title !== undefined) updates.title = title.trim();
-    if (description !== undefined) updates.description = description ? description.trim() : null;
+    if (description !== undefined)
+      updates.description = description ? description.trim() : null;
     if (host_name !== undefined) updates.host_name = host_name.trim();
     if (host_email !== undefined) updates.host_email = host_email.trim();
     if (duration !== undefined) updates.duration = duration;
-    if (activity_type !== undefined) updates.activity_type = activity_type ? activity_type.trim() : null;
-    if (equipment_needed !== undefined) updates.equipment_needed = equipment_needed ? equipment_needed.trim() : null;
+    if (activity_type !== undefined)
+      updates.activity_type = activity_type ? activity_type.trim() : null;
+    if (equipment_needed !== undefined)
+      updates.equipment_needed = equipment_needed
+        ? equipment_needed.trim()
+        : null;
     if (capacity !== undefined) updates.capacity = capacity;
-    if (time_preference !== undefined) updates.time_preference = time_preference ? time_preference.trim() : null;
+    if (time_preference !== undefined)
+      updates.time_preference = time_preference ? time_preference.trim() : null;
     if (notes !== undefined) updates.notes = notes ? notes.trim() : null;
     if (status !== undefined) updates.status = status;
-    if (scheduled_start !== undefined) updates.scheduled_start = scheduled_start;
+    if (scheduled_start !== undefined)
+      updates.scheduled_start = scheduled_start;
     if (scheduled_end !== undefined) updates.scheduled_end = scheduled_end;
-    if (location !== undefined) updates.location = location ? location.trim() : null;
+    if (location !== undefined)
+      updates.location = location ? location.trim() : null;
 
     updateActivity(id, updates);
 
@@ -268,13 +311,13 @@ export const PUT: APIRoute = async ({ params, request }) => {
     return new Response(
       JSON.stringify({
         success: true,
-        activity: updatedActivity
+        activity: updatedActivity,
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   } catch (error) {
@@ -282,13 +325,13 @@ export const PUT: APIRoute = async ({ params, request }) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to update activity'
+        error: 'Failed to update activity',
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   }
@@ -302,13 +345,13 @@ export const DELETE: APIRoute = async ({ params }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Invalid activity ID'
+          error: 'Invalid activity ID',
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -319,13 +362,13 @@ export const DELETE: APIRoute = async ({ params }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Activity not found'
+          error: 'Activity not found',
         }),
         {
           status: 404,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -334,13 +377,13 @@ export const DELETE: APIRoute = async ({ params }) => {
 
     return new Response(
       JSON.stringify({
-        success: true
+        success: true,
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   } catch (error) {
@@ -348,13 +391,13 @@ export const DELETE: APIRoute = async ({ params }) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to delete activity'
+        error: 'Failed to delete activity',
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   }

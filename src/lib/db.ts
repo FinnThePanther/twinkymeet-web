@@ -63,7 +63,8 @@ export interface LoginAttempt {
 }
 
 // Get database path from environment or use default
-const dbPath = process.env.DATABASE_PATH || join(process.cwd(), 'db', 'local.db');
+const dbPath =
+  process.env.DATABASE_PATH || join(process.cwd(), 'db', 'local.db');
 
 // Initialize database connection
 let db: Database.Database | null = null;
@@ -124,19 +125,21 @@ export function getAttendeeById(id: number): Attendee | undefined {
 }
 
 export function getAllAttendees(): Attendee[] {
-  const stmt = getDb().prepare('SELECT * FROM attendees ORDER BY created_at DESC');
+  const stmt = getDb().prepare(
+    'SELECT * FROM attendees ORDER BY created_at DESC'
+  );
   return stmt.all() as Attendee[];
 }
 
 export function updateAttendee(id: number, updates: Partial<Attendee>): void {
   const fields = Object.keys(updates)
-    .filter(key => key !== 'id' && key !== 'created_at')
-    .map(key => `${key} = ?`)
+    .filter((key) => key !== 'id' && key !== 'created_at')
+    .map((key) => `${key} = ?`)
     .join(', ');
 
   const values = Object.keys(updates)
-    .filter(key => key !== 'id' && key !== 'created_at')
-    .map(key => updates[key as keyof Attendee]);
+    .filter((key) => key !== 'id' && key !== 'created_at')
+    .map((key) => updates[key as keyof Attendee]);
 
   const stmt = getDb().prepare(`UPDATE attendees SET ${fields} WHERE id = ?`);
   stmt.run(...values, id);
@@ -172,10 +175,14 @@ export function insertActivity(activity: Activity): number {
 
 export function getAllActivities(status?: string): Activity[] {
   if (status) {
-    const stmt = getDb().prepare('SELECT * FROM activities WHERE status = ? ORDER BY created_at DESC');
+    const stmt = getDb().prepare(
+      'SELECT * FROM activities WHERE status = ? ORDER BY created_at DESC'
+    );
     return stmt.all(status) as Activity[];
   }
-  const stmt = getDb().prepare('SELECT * FROM activities ORDER BY created_at DESC');
+  const stmt = getDb().prepare(
+    'SELECT * FROM activities ORDER BY created_at DESC'
+  );
   return stmt.all() as Activity[];
 }
 
@@ -186,13 +193,13 @@ export function getActivityById(id: number): Activity | undefined {
 
 export function updateActivity(id: number, updates: Partial<Activity>): void {
   const fields = Object.keys(updates)
-    .filter(key => key !== 'id' && key !== 'created_at')
-    .map(key => `${key} = ?`)
+    .filter((key) => key !== 'id' && key !== 'created_at')
+    .map((key) => `${key} = ?`)
     .join(', ');
 
   const values = Object.keys(updates)
-    .filter(key => key !== 'id' && key !== 'created_at')
-    .map(key => updates[key as keyof Activity]);
+    .filter((key) => key !== 'id' && key !== 'created_at')
+    .map((key) => updates[key as keyof Activity]);
 
   const stmt = getDb().prepare(`UPDATE activities SET ${fields} WHERE id = ?`);
   stmt.run(...values, id);
@@ -211,7 +218,9 @@ export function getSetting(key: string): string | undefined {
 }
 
 export function setSetting(key: string, value: string): void {
-  const stmt = getDb().prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+  const stmt = getDb().prepare(
+    'INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)'
+  );
   stmt.run(key, value);
 }
 
@@ -222,18 +231,24 @@ export function getAllSettings(): Setting[] {
 
 // Announcement operations
 export function getActiveAnnouncements(): Announcement[] {
-  const stmt = getDb().prepare('SELECT * FROM announcements WHERE active = 1 ORDER BY created_at DESC');
+  const stmt = getDb().prepare(
+    'SELECT * FROM announcements WHERE active = 1 ORDER BY created_at DESC'
+  );
   return stmt.all() as Announcement[];
 }
 
 export function insertAnnouncement(message: string): number {
-  const stmt = getDb().prepare('INSERT INTO announcements (message) VALUES (?)');
+  const stmt = getDb().prepare(
+    'INSERT INTO announcements (message) VALUES (?)'
+  );
   const result = stmt.run(message);
   return result.lastInsertRowid as number;
 }
 
 export function getAllAnnouncements(): Announcement[] {
-  const stmt = getDb().prepare('SELECT * FROM announcements ORDER BY created_at DESC');
+  const stmt = getDb().prepare(
+    'SELECT * FROM announcements ORDER BY created_at DESC'
+  );
   return stmt.all() as Announcement[];
 }
 
@@ -243,12 +258,16 @@ export function getAnnouncementById(id: number): Announcement | undefined {
 }
 
 export function updateAnnouncement(id: number, message: string): void {
-  const stmt = getDb().prepare('UPDATE announcements SET message = ? WHERE id = ?');
+  const stmt = getDb().prepare(
+    'UPDATE announcements SET message = ? WHERE id = ?'
+  );
   stmt.run(message, id);
 }
 
 export function toggleAnnouncementActive(id: number, active: boolean): void {
-  const stmt = getDb().prepare('UPDATE announcements SET active = ? WHERE id = ?');
+  const stmt = getDb().prepare(
+    'UPDATE announcements SET active = ? WHERE id = ?'
+  );
   stmt.run(active ? 1 : 0, id);
 }
 
@@ -315,7 +334,9 @@ export function recordFailedLogin(ipAddress: string): boolean {
   const db = getDb();
 
   // Get current attempt record
-  const selectStmt = db.prepare('SELECT attempts FROM login_attempts WHERE ip_address = ?');
+  const selectStmt = db.prepare(
+    'SELECT attempts FROM login_attempts WHERE ip_address = ?'
+  );
   const result = selectStmt.get(ipAddress) as { attempts: number } | undefined;
 
   const currentAttempts = result ? result.attempts : 0;
@@ -345,7 +366,9 @@ export function recordFailedLogin(ipAddress: string): boolean {
  * Clear login attempts for an IP address (called on successful login)
  */
 export function clearLoginAttempts(ipAddress: string): void {
-  const stmt = getDb().prepare('DELETE FROM login_attempts WHERE ip_address = ?');
+  const stmt = getDb().prepare(
+    'DELETE FROM login_attempts WHERE ip_address = ?'
+  );
   stmt.run(ipAddress);
 }
 
@@ -353,7 +376,9 @@ export function clearLoginAttempts(ipAddress: string): void {
  * Get remaining attempts before lockout
  */
 export function getRemainingAttempts(ipAddress: string): number {
-  const stmt = getDb().prepare('SELECT attempts FROM login_attempts WHERE ip_address = ?');
+  const stmt = getDb().prepare(
+    'SELECT attempts FROM login_attempts WHERE ip_address = ?'
+  );
   const result = stmt.get(ipAddress) as { attempts: number } | undefined;
 
   if (!result) {

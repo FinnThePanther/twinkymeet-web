@@ -6,7 +6,10 @@ const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 /**
  * Verify a password against a bcrypt hash
  */
-export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+export async function verifyPassword(
+  password: string,
+  hash: string
+): Promise<boolean> {
   try {
     return await bcrypt.compare(password, hash);
   } catch (error) {
@@ -39,7 +42,10 @@ export function generateSessionToken(sessionSecret: string): string {
 /**
  * Verify a session token and check if it's expired
  */
-export function verifySessionToken(token: string, sessionSecret: string): boolean {
+export function verifySessionToken(
+  token: string,
+  sessionSecret: string
+): boolean {
   try {
     if (!sessionSecret) {
       console.error('SESSION_SECRET is required');
@@ -93,7 +99,7 @@ export function createSessionCookie(token: string): string {
     `Max-Age=${maxAge}`,
     'Path=/',
     'HttpOnly',
-    'SameSite=Lax'
+    'SameSite=Lax',
   ];
 
   // Only set Secure flag in production (requires HTTPS)
@@ -119,7 +125,7 @@ export function parseSessionCookie(cookieHeader: string | null): string | null {
     return null;
   }
 
-  const cookies = cookieHeader.split(';').map(c => c.trim());
+  const cookies = cookieHeader.split(';').map((c) => c.trim());
 
   for (const cookie of cookies) {
     const [name, value] = cookie.split('=');

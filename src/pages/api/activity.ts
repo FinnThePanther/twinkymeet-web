@@ -2,8 +2,21 @@ import type { APIRoute } from 'astro';
 import { insertActivity, getSetting } from '../../lib/db';
 
 const VALID_DURATIONS = [30, 60, 120, 180, 240];
-const VALID_ACTIVITY_TYPES = ['Gaming', 'Outdoor', 'Creative', 'Social', '18+', 'Other'];
-const VALID_TIME_PREFERENCES = ['Morning', 'Afternoon', 'Evening', 'Late Night', 'No Preference'];
+const VALID_ACTIVITY_TYPES = [
+  'Gaming',
+  'Outdoor',
+  'Creative',
+  'Social',
+  '18+',
+  'Other',
+];
+const VALID_TIME_PREFERENCES = [
+  'Morning',
+  'Afternoon',
+  'Evening',
+  'Late Night',
+  'No Preference',
+];
 
 export const prerender = false;
 
@@ -15,7 +28,7 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Activity submissions are currently closed'
+          error: 'Activity submissions are currently closed',
         }),
         { status: 403, headers: { 'Content-Type': 'application/json' } }
       );
@@ -32,7 +45,7 @@ export const POST: APIRoute = async ({ request }) => {
       activity_type,
       equipment_needed,
       capacity,
-      time_preference
+      time_preference,
     } = body;
 
     // Validate required fields
@@ -44,13 +57,21 @@ export const POST: APIRoute = async ({ request }) => {
       errors.title = 'Title must be less than 255 characters';
     }
 
-    if (!host_name || typeof host_name !== 'string' || host_name.trim().length === 0) {
+    if (
+      !host_name ||
+      typeof host_name !== 'string' ||
+      host_name.trim().length === 0
+    ) {
       errors.host_name = 'Your name is required';
     } else if (host_name.trim().length > 255) {
       errors.host_name = 'Name must be less than 255 characters';
     }
 
-    if (!host_email || typeof host_email !== 'string' || host_email.trim().length === 0) {
+    if (
+      !host_email ||
+      typeof host_email !== 'string' ||
+      host_email.trim().length === 0
+    ) {
       errors.host_email = 'Your email is required';
     } else {
       // Validate email format
@@ -60,7 +81,11 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
-    if (!description || typeof description !== 'string' || description.trim().length === 0) {
+    if (
+      !description ||
+      typeof description !== 'string' ||
+      description.trim().length === 0
+    ) {
       errors.description = 'Description is required';
     } else if (description.trim().length > 2000) {
       errors.description = 'Description must be less than 2000 characters';
@@ -86,7 +111,8 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Validate optional fields if provided
     if (equipment_needed && equipment_needed.length > 1000) {
-      errors.equipment_needed = 'Equipment description must be less than 1000 characters';
+      errors.equipment_needed =
+        'Equipment description must be less than 1000 characters';
     }
 
     if (capacity !== undefined && capacity !== null) {
@@ -101,7 +127,7 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           success: false,
           error: 'Validation failed',
-          details: errors
+          details: errors,
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
@@ -124,7 +150,7 @@ export const POST: APIRoute = async ({ request }) => {
       equipment_needed: equipment_needed?.trim() || undefined,
       capacity: capacity || undefined,
       time_preference,
-      status: 'pending'
+      status: 'pending',
     });
 
     // Return success response
@@ -132,17 +158,16 @@ export const POST: APIRoute = async ({ request }) => {
       JSON.stringify({
         success: true,
         message: 'Activity submitted successfully. Thank you!',
-        activityId: activityId
+        activityId: activityId,
       }),
       { status: 201, headers: { 'Content-Type': 'application/json' } }
     );
-
   } catch (error) {
     console.error('Error processing activity submission:', error);
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Internal server error. Please try again later.'
+        error: 'Internal server error. Please try again later.',
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );

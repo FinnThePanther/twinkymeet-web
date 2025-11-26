@@ -11,13 +11,13 @@ export const DELETE: APIRoute = async ({ params }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Invalid announcement ID'
+          error: 'Invalid announcement ID',
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -28,13 +28,13 @@ export const DELETE: APIRoute = async ({ params }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Announcement not found'
+          error: 'Announcement not found',
         }),
         {
           status: 404,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -43,13 +43,13 @@ export const DELETE: APIRoute = async ({ params }) => {
 
     return new Response(
       JSON.stringify({
-        success: true
+        success: true,
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   } catch (error) {
@@ -57,13 +57,13 @@ export const DELETE: APIRoute = async ({ params }) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to delete announcement'
+        error: 'Failed to delete announcement',
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   }

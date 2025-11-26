@@ -33,7 +33,7 @@ const eventDateStart = getSetting('event_date_start') || '2026-07-01';
         widths={[640, 1024, 1920]}
         sizes="100vw"
       />
-      <!-- Dark overlay for text readability -->
+      {/* Dark overlay for text readability */}
       <div
         class="absolute inset-0 bg-black"
         style={`opacity: ${overlayOpacity}`}
@@ -47,7 +47,7 @@ const eventDateStart = getSetting('event_date_start') || '2026-07-01';
   )}
 
   <!-- Content -->
-  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
     <div class="text-center text-white">
       <h1 class="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
         {title}
@@ -88,36 +88,34 @@ const eventDateStart = getSetting('event_date_start') || '2026-07-01';
   </div>
 </section>
 
-{showCountdown && (
-  <script define:vars={{ eventDateStart }}>
-    function updateCountdown() {
-      const eventDate = new Date(eventDateStart + 'T00:00:00').getTime();
-      const now = new Date().getTime();
-      const distance = eventDate - now;
+{showCountdown && <script define:vars={{ eventDateStart }} is:inline>
+  function updateCountdown() {
+    const eventDate = new Date(eventDateStart + 'T00:00:00').getTime();
+    const now = new Date().getTime();
+    const distance = eventDate - now;
 
-      if (distance < 0) {
-        document.getElementById('countdown-timer')?.classList.add('hidden');
-        return;
-      }
-
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-      const daysEl = document.getElementById('days');
-      const hoursEl = document.getElementById('hours');
-      const minutesEl = document.getElementById('minutes');
-      const secondsEl = document.getElementById('seconds');
-
-      if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
-      if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
-      if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
-      if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+    if (distance < 0) {
+      document.getElementById('countdown-timer')?.classList.add('hidden');
+      return;
     }
 
-    // Update immediately and then every second
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
-  </script>
-)}
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    const daysEl = document.getElementById('days');
+    const hoursEl = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+
+    if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+    if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+    if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+    if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+  }
+
+  // Update immediately and then every second
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+</script>}

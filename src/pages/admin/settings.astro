@@ -8,7 +8,8 @@ export const prerender = false;
 // Check authentication
 const sessionCookie = Astro.cookies.get('session')?.value;
 const sessionSecret = import.meta.env.SESSION_SECRET || '';
-const isAuthenticated = sessionCookie && verifySessionToken(sessionCookie, sessionSecret);
+const isAuthenticated =
+  sessionCookie && verifySessionToken(sessionCookie, sessionSecret);
 
 if (!isAuthenticated) {
   return Astro.redirect('/admin/login');
@@ -17,7 +18,7 @@ if (!isAuthenticated) {
 // Fetch current settings
 const settingsArray = getAllSettings();
 const settings: Record<string, string> = {};
-settingsArray.forEach(s => {
+settingsArray.forEach((s) => {
   settings[s.key] = s.value;
 });
 
@@ -26,65 +27,87 @@ const announcements = getAllAnnouncements();
 ---
 
 <AdminLayout title="Site Settings">
-  <div class="max-w-5xl mx-auto">
-    <h1 class="text-3xl font-bold text-gray-900 mb-8">Site Settings</h1>
+  <div class="mx-auto max-w-5xl">
+    <h1 class="mb-8 text-3xl font-bold text-gray-900">Site Settings</h1>
 
     <div class="space-y-8">
       <!-- Event Info Section -->
-      <div class="bg-white rounded-lg shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-200">
+      <div class="rounded-lg bg-white shadow-sm">
+        <div class="border-b border-gray-200 px-6 py-4">
           <h2 class="text-xl font-semibold text-gray-900">Event Information</h2>
-          <p class="text-sm text-gray-600 mt-1">Configure basic event details</p>
+          <p class="mt-1 text-sm text-gray-600">
+            Configure basic event details
+          </p>
         </div>
         <div class="p-6">
           <form id="event-info-form">
             <div class="space-y-4">
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label for="event-start" class="block text-sm font-medium text-gray-700">Start Date</label>
+                  <label
+                    for="event-start"
+                    class="block text-sm font-medium text-gray-700"
+                    >Start Date</label
+                  >
                   <input
                     type="date"
                     id="event-start"
                     value={settings.event_date_start || ''}
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   />
                 </div>
                 <div>
-                  <label for="event-end" class="block text-sm font-medium text-gray-700">End Date</label>
+                  <label
+                    for="event-end"
+                    class="block text-sm font-medium text-gray-700"
+                    >End Date</label
+                  >
                   <input
                     type="date"
                     id="event-end"
                     value={settings.event_date_end || ''}
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
+                <label
+                  for="location"
+                  class="block text-sm font-medium text-gray-700"
+                  >Location</label
+                >
                 <input
                   type="text"
                   id="location"
                   value={settings.location || ''}
                   maxlength="255"
-                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 />
               </div>
             </div>
 
-            <div id="event-info-error" class="hidden mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <div
+              id="event-info-error"
+              class="mt-4 hidden rounded-md border border-red-200 bg-red-50 p-3"
+            >
               <p class="text-sm text-red-600"></p>
             </div>
 
-            <div id="event-info-success" class="hidden mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
-              <p class="text-sm text-green-600">Event information updated successfully!</p>
+            <div
+              id="event-info-success"
+              class="mt-4 hidden rounded-md border border-green-200 bg-green-50 p-3"
+            >
+              <p class="text-sm text-green-600">
+                Event information updated successfully!
+              </p>
             </div>
 
             <div class="mt-6">
               <button
                 type="submit"
                 id="save-event-info"
-                class="px-6 py-2 text-white rounded-md shadow-sm font-medium"
+                class="rounded-md px-6 py-2 font-medium text-white shadow-sm"
                 style="background-color: #4f46e5;"
               >
                 Save Event Info
@@ -95,10 +118,12 @@ const announcements = getAllAnnouncements();
       </div>
 
       <!-- Feature Toggles Section -->
-      <div class="bg-white rounded-lg shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-200">
+      <div class="rounded-lg bg-white shadow-sm">
+        <div class="border-b border-gray-200 px-6 py-4">
           <h2 class="text-xl font-semibold text-gray-900">Feature Toggles</h2>
-          <p class="text-sm text-gray-600 mt-1">Enable or disable public forms</p>
+          <p class="mt-1 text-sm text-gray-600">
+            Enable or disable public forms
+          </p>
         </div>
         <div class="p-6">
           <form id="feature-toggles-form">
@@ -107,46 +132,63 @@ const announcements = getAllAnnouncements();
               <div class="flex items-center justify-between">
                 <div class="flex-1">
                   <h3 class="text-base font-medium text-gray-900">RSVP Form</h3>
-                  <p class="text-sm text-gray-600">Allow attendees to submit RSVPs</p>
+                  <p class="text-sm text-gray-600">
+                    Allow attendees to submit RSVPs
+                  </p>
                 </div>
-                <label class="relative inline-flex items-center cursor-pointer">
+                <label class="relative inline-flex cursor-pointer items-center">
                   <input
                     type="checkbox"
                     id="rsvp-toggle"
                     checked={settings.rsvp_open === 'true'}
-                    class="sr-only peer"
+                    class="peer sr-only"
                   />
-                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                  <div
+                    class="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-indigo-600 peer-focus:ring-4 peer-focus:ring-indigo-300 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"
+                  >
+                  </div>
                 </label>
               </div>
 
               <!-- Activity Submissions Toggle -->
               <div class="flex items-center justify-between">
                 <div class="flex-1">
-                  <h3 class="text-base font-medium text-gray-900">Activity Submissions</h3>
-                  <p class="text-sm text-gray-600">Allow attendees to propose activities</p>
+                  <h3 class="text-base font-medium text-gray-900">
+                    Activity Submissions
+                  </h3>
+                  <p class="text-sm text-gray-600">
+                    Allow attendees to propose activities
+                  </p>
                 </div>
-                <label class="relative inline-flex items-center cursor-pointer">
+                <label class="relative inline-flex cursor-pointer items-center">
                   <input
                     type="checkbox"
                     id="submissions-toggle"
                     checked={settings.activity_submissions_open === 'true'}
-                    class="sr-only peer"
+                    class="peer sr-only"
                   />
-                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                  <div
+                    class="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-indigo-600 peer-focus:ring-4 peer-focus:ring-indigo-300 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"
+                  >
+                  </div>
                 </label>
               </div>
             </div>
 
-            <div id="toggles-success" class="hidden mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
-              <p class="text-sm text-green-600">Feature toggles updated successfully!</p>
+            <div
+              id="toggles-success"
+              class="mt-4 hidden rounded-md border border-green-200 bg-green-50 p-3"
+            >
+              <p class="text-sm text-green-600">
+                Feature toggles updated successfully!
+              </p>
             </div>
 
             <div class="mt-6">
               <button
                 type="submit"
                 id="save-toggles"
-                class="px-6 py-2 text-white rounded-md shadow-sm font-medium"
+                class="rounded-md px-6 py-2 font-medium text-white shadow-sm"
                 style="background-color: #4f46e5;"
               >
                 Save Feature Toggles
@@ -157,10 +199,12 @@ const announcements = getAllAnnouncements();
       </div>
 
       <!-- Announcements Section -->
-      <div class="bg-white rounded-lg shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-200">
+      <div class="rounded-lg bg-white shadow-sm">
+        <div class="border-b border-gray-200 px-6 py-4">
           <h2 class="text-xl font-semibold text-gray-900">Announcements</h2>
-          <p class="text-sm text-gray-600 mt-1">Manage site-wide announcements displayed to attendees</p>
+          <p class="mt-1 text-sm text-gray-600">
+            Manage site-wide announcements displayed to attendees
+          </p>
         </div>
         <div class="p-6">
           <!-- Add New Announcement Form -->
@@ -171,72 +215,84 @@ const announcements = getAllAnnouncements();
                 id="new-announcement"
                 placeholder="Enter a new announcement..."
                 maxlength="500"
-                class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                class="flex-1 rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               />
               <button
                 type="submit"
                 id="add-announcement-btn"
-                class="px-6 py-2 text-white rounded-md shadow-sm font-medium"
+                class="rounded-md px-6 py-2 font-medium text-white shadow-sm"
                 style="background-color: #16a34a;"
               >
                 Add
               </button>
             </div>
-            <div id="announcement-error" class="hidden mt-2 p-3 bg-red-50 border border-red-200 rounded-md">
+            <div
+              id="announcement-error"
+              class="mt-2 hidden rounded-md border border-red-200 bg-red-50 p-3"
+            >
               <p class="text-sm text-red-600"></p>
             </div>
           </form>
 
           <!-- Announcements List -->
-          {announcements.length === 0 ? (
-            <div class="text-center py-8 text-gray-500">
-              <p>No announcements yet. Add one above to get started.</p>
-            </div>
-          ) : (
-            <div class="space-y-3" id="announcements-list">
-              {announcements.map(announcement => (
-                <div
-                  class="announcement-item flex items-start gap-3 p-4 border border-gray-200 rounded-md"
-                  data-id={announcement.id}
-                >
-                  <div class="flex-1">
-                    <p class="text-gray-900 announcement-text">{announcement.message}</p>
-                    <p class="text-xs text-gray-500 mt-1">
-                      {new Date(announcement.created_at!).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </p>
+          {
+            announcements.length === 0 ? (
+              <div class="py-8 text-center text-gray-500">
+                <p>No announcements yet. Add one above to get started.</p>
+              </div>
+            ) : (
+              <div class="space-y-3" id="announcements-list">
+                {announcements.map((announcement) => (
+                  <div
+                    class="announcement-item flex items-start gap-3 rounded-md border border-gray-200 p-4"
+                    data-id={announcement.id}
+                  >
+                    <div class="flex-1">
+                      <p class="announcement-text text-gray-900">
+                        {announcement.message}
+                      </p>
+                      <p class="mt-1 text-xs text-gray-500">
+                        {new Date(announcement.created_at!).toLocaleDateString(
+                          'en-US',
+                          {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          }
+                        )}
+                      </p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span
+                        class={`rounded-full px-2 py-1 text-xs font-medium ${
+                          announcement.active === 1
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {announcement.active === 1 ? 'Active' : 'Inactive'}
+                      </span>
+                      <button
+                        class="toggle-active-btn px-2 py-1 text-sm text-indigo-600 hover:text-indigo-700"
+                        data-id={announcement.id}
+                        data-active={announcement.active}
+                      >
+                        {announcement.active === 1 ? 'Deactivate' : 'Activate'}
+                      </button>
+                      <button
+                        class="delete-announcement-btn px-2 py-1 text-sm text-red-600 hover:text-red-700"
+                        data-id={announcement.id}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
-                  <div class="flex items-center gap-2">
-                    <span class={`px-2 py-1 text-xs font-medium rounded-full ${
-                      announcement.active === 1
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {announcement.active === 1 ? 'Active' : 'Inactive'}
-                    </span>
-                    <button
-                      class="toggle-active-btn text-sm text-indigo-600 hover:text-indigo-700 px-2 py-1"
-                      data-id={announcement.id}
-                      data-active={announcement.active}
-                    >
-                      {announcement.active === 1 ? 'Deactivate' : 'Activate'}
-                    </button>
-                    <button
-                      class="delete-announcement-btn text-sm text-red-600 hover:text-red-700 px-2 py-1"
-                      data-id={announcement.id}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )
+          }
         </div>
       </div>
     </div>
@@ -244,10 +300,14 @@ const announcements = getAllAnnouncements();
 
   <script>
     // Event Info Form
-    const eventInfoForm = document.getElementById('event-info-form') as HTMLFormElement;
+    const eventInfoForm = document.getElementById(
+      'event-info-form'
+    ) as HTMLFormElement;
     const eventInfoError = document.getElementById('event-info-error');
     const eventInfoSuccess = document.getElementById('event-info-success');
-    const saveEventInfoBtn = document.getElementById('save-event-info') as HTMLButtonElement;
+    const saveEventInfoBtn = document.getElementById(
+      'save-event-info'
+    ) as HTMLButtonElement;
 
     eventInfoForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -258,16 +318,21 @@ const announcements = getAllAnnouncements();
       eventInfoSuccess?.classList.add('hidden');
 
       const data = {
-        event_date_start: (document.getElementById('event-start') as HTMLInputElement).value,
-        event_date_end: (document.getElementById('event-end') as HTMLInputElement).value,
-        location: (document.getElementById('location') as HTMLInputElement).value
+        event_date_start: (
+          document.getElementById('event-start') as HTMLInputElement
+        ).value,
+        event_date_end: (
+          document.getElementById('event-end') as HTMLInputElement
+        ).value,
+        location: (document.getElementById('location') as HTMLInputElement)
+          .value,
       };
 
       try {
         const response = await fetch('/api/admin/settings', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+          body: JSON.stringify(data),
         });
 
         const result = await response.json();
@@ -295,9 +360,13 @@ const announcements = getAllAnnouncements();
     });
 
     // Feature Toggles Form
-    const togglesForm = document.getElementById('feature-toggles-form') as HTMLFormElement;
+    const togglesForm = document.getElementById(
+      'feature-toggles-form'
+    ) as HTMLFormElement;
     const togglesSuccess = document.getElementById('toggles-success');
-    const saveTogglesBtn = document.getElementById('save-toggles') as HTMLButtonElement;
+    const saveTogglesBtn = document.getElementById(
+      'save-toggles'
+    ) as HTMLButtonElement;
 
     togglesForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -307,15 +376,18 @@ const announcements = getAllAnnouncements();
       togglesSuccess?.classList.add('hidden');
 
       const data = {
-        rsvp_open: (document.getElementById('rsvp-toggle') as HTMLInputElement).checked,
-        activity_submissions_open: (document.getElementById('submissions-toggle') as HTMLInputElement).checked
+        rsvp_open: (document.getElementById('rsvp-toggle') as HTMLInputElement)
+          .checked,
+        activity_submissions_open: (
+          document.getElementById('submissions-toggle') as HTMLInputElement
+        ).checked,
       };
 
       try {
         const response = await fetch('/api/admin/settings', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+          body: JSON.stringify(data),
         });
 
         if (response.ok) {
@@ -334,19 +406,26 @@ const announcements = getAllAnnouncements();
     });
 
     // Add Announcement
-    const addAnnouncementForm = document.getElementById('add-announcement-form') as HTMLFormElement;
+    const addAnnouncementForm = document.getElementById(
+      'add-announcement-form'
+    ) as HTMLFormElement;
     const announcementError = document.getElementById('announcement-error');
-    const addAnnouncementBtn = document.getElementById('add-announcement-btn') as HTMLButtonElement;
+    const addAnnouncementBtn = document.getElementById(
+      'add-announcement-btn'
+    ) as HTMLButtonElement;
 
     addAnnouncementForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const input = document.getElementById('new-announcement') as HTMLInputElement;
+      const input = document.getElementById(
+        'new-announcement'
+      ) as HTMLInputElement;
       const message = input.value.trim();
 
       if (!message) {
         if (announcementError) {
-          announcementError.querySelector('p')!.textContent = 'Please enter an announcement message';
+          announcementError.querySelector('p')!.textContent =
+            'Please enter an announcement message';
           announcementError.classList.remove('hidden');
         }
         return;
@@ -360,21 +439,23 @@ const announcements = getAllAnnouncements();
         const response = await fetch('/api/admin/announcements', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message })
+          body: JSON.stringify({ message }),
         });
 
         if (response.ok) {
           window.location.reload();
         } else {
           if (announcementError) {
-            announcementError.querySelector('p')!.textContent = 'Failed to add announcement';
+            announcementError.querySelector('p')!.textContent =
+              'Failed to add announcement';
             announcementError.classList.remove('hidden');
           }
         }
       } catch (error) {
         console.error('Error adding announcement:', error);
         if (announcementError) {
-          announcementError.querySelector('p')!.textContent = 'An error occurred';
+          announcementError.querySelector('p')!.textContent =
+            'An error occurred';
           announcementError.classList.remove('hidden');
         }
       } finally {
@@ -384,7 +465,7 @@ const announcements = getAllAnnouncements();
     });
 
     // Toggle Active
-    document.querySelectorAll('.toggle-active-btn').forEach(btn => {
+    document.querySelectorAll('.toggle-active-btn').forEach((btn) => {
       btn.addEventListener('click', async (e) => {
         const button = e.target as HTMLButtonElement;
         const id = button.dataset.id;
@@ -393,11 +474,14 @@ const announcements = getAllAnnouncements();
         button.disabled = true;
 
         try {
-          const response = await fetch(`/api/admin/announcements/${id}/toggle`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ active: !currentActive })
-          });
+          const response = await fetch(
+            `/api/admin/announcements/${id}/toggle`,
+            {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ active: !currentActive }),
+            }
+          );
 
           if (response.ok) {
             window.location.reload();
@@ -414,7 +498,7 @@ const announcements = getAllAnnouncements();
     });
 
     // Delete Announcement
-    document.querySelectorAll('.delete-announcement-btn').forEach(btn => {
+    document.querySelectorAll('.delete-announcement-btn').forEach((btn) => {
       btn.addEventListener('click', async (e) => {
         const button = e.target as HTMLButtonElement;
         const id = button.dataset.id;
@@ -427,7 +511,7 @@ const announcements = getAllAnnouncements();
 
         try {
           const response = await fetch(`/api/admin/announcements/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
           });
 
           if (response.ok) {

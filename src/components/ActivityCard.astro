@@ -28,95 +28,162 @@ const getStatusColor = (status: string) => {
 };
 ---
 
-<div class="bg-white rounded-lg overflow-hidden hover-lift" style="box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.1);">
+<div
+  class="hover-lift overflow-hidden rounded-lg bg-white"
+  style="box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.1);"
+>
   <!-- Activity Image (if provided) -->
-  {image && (
-    <div class="w-full h-48 overflow-hidden image-zoom">
-      <Image
-        src={image}
-        alt={activity.title}
-        class="w-full h-full object-cover"
-        widths={[400, 800]}
-        sizes="(max-width: 768px) 100vw, 400px"
-      />
-    </div>
-  )}
+  {
+    image && (
+      <div class="image-zoom h-48 w-full overflow-hidden">
+        <Image
+          src={image}
+          alt={activity.title}
+          class="h-full w-full object-cover"
+          widths={[400, 800]}
+          sizes="(max-width: 768px) 100vw, 400px"
+        />
+      </div>
+    )
+  }
 
   <!-- Card Content -->
   <div class="p-6">
-  <!-- Header -->
-  <div class="flex justify-between items-start mb-3">
-    <h3 class="text-xl font-semibold text-gray-900 flex-1">{activity.title}</h3>
-    <div class="flex flex-col gap-2 ml-2">
-      {activity.activity_type && (
-        <span class={`px-3 py-1 text-xs font-semibold rounded-full text-center ${getBadgeColor()}`}>
-          {activity.activity_type}
-        </span>
-      )}
-      {activity.status === 'scheduled' && (
-        <span class={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(activity.status)} flex items-center justify-center gap-1`}>
-          <span class="w-2 h-2 bg-accent-600 rounded-full"></span>
-          Scheduled
-        </span>
-      )}
-      {activity.status === 'approved' && (
-        <span class={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(activity.status)} flex items-center justify-center gap-1`}>
-          <span class="w-2 h-2 bg-yellow-600 rounded-full"></span>
-          Time TBA
-        </span>
-      )}
-    </div>
-  </div>
-
-  <!-- Description -->
-  {activity.description && (
-    <p class="text-gray-600 mb-4 line-clamp-3">{activity.description}</p>
-  )}
-
-  <!-- Details Grid -->
-  <div class="space-y-2 text-sm">
-    <div class="flex items-center text-gray-700">
-      <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-      </svg>
-      <span class="font-medium">Host:</span>
-      <span class="ml-1">{activity.host_name}</span>
-    </div>
-
-    <div class="flex items-center text-gray-700">
-      <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <span>{formatDuration(activity.duration)}</span>
-    </div>
-
-    {activity.capacity && (
-      <div class="flex items-center text-gray-700">
-        <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-        <span>Max {activity.capacity} participants</span>
+    <!-- Header -->
+    <div class="mb-3 flex items-start justify-between">
+      <h3 class="flex-1 text-xl font-semibold text-gray-900">
+        {activity.title}
+      </h3>
+      <div class="ml-2 flex flex-col gap-2">
+        {
+          activity.activity_type && (
+            <span
+              class={`rounded-full px-3 py-1 text-center text-xs font-semibold ${getBadgeColor()}`}
+            >
+              {activity.activity_type}
+            </span>
+          )
+        }
+        {
+          activity.status === 'scheduled' && (
+            <span
+              class={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(activity.status)} flex items-center justify-center gap-1`}
+            >
+              <span class="bg-accent-600 h-2 w-2 rounded-full" />
+              Scheduled
+            </span>
+          )
+        }
+        {
+          activity.status === 'approved' && (
+            <span
+              class={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(activity.status)} flex items-center justify-center gap-1`}
+            >
+              <span class="h-2 w-2 rounded-full bg-yellow-600" />
+              Time TBA
+            </span>
+          )
+        }
       </div>
-    )}
-
-    {activity.scheduled_start ? (
-      <div class="flex items-center text-gray-700">
-        <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-        <span>{new Date(activity.scheduled_start).toLocaleString()}</span>
-      </div>
-    ) : (
-      <div class="text-sm text-gray-500 italic">Time TBA</div>
-    )}
-  </div>
-
-  {activity.equipment_needed && (
-    <div class="mt-4 pt-4 border-t border-gray-200">
-      <p class="text-xs text-gray-600">
-        <span class="font-semibold">Equipment needed:</span> {activity.equipment_needed}
-      </p>
     </div>
-  )}
+
+    <!-- Description -->
+    {
+      activity.description && (
+        <p class="mb-4 line-clamp-3 text-gray-600">{activity.description}</p>
+      )
+    }
+
+    <!-- Details Grid -->
+    <div class="space-y-2 text-sm">
+      <div class="flex items-center text-gray-700">
+        <svg
+          class="mr-2 h-5 w-5 text-gray-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          ></path>
+        </svg>
+        <span class="font-medium">Host:</span>
+        <span class="ml-1">{activity.host_name}</span>
+      </div>
+
+      <div class="flex items-center text-gray-700">
+        <svg
+          class="mr-2 h-5 w-5 text-gray-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span>{formatDuration(activity.duration)}</span>
+      </div>
+
+      {
+        activity.capacity && (
+          <div class="flex items-center text-gray-700">
+            <svg
+              class="mr-2 h-5 w-5 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+            <span>Max {activity.capacity} participants</span>
+          </div>
+        )
+      }
+
+      {
+        activity.scheduled_start ? (
+          <div class="flex items-center text-gray-700">
+            <svg
+              class="mr-2 h-5 w-5 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            <span>{new Date(activity.scheduled_start).toLocaleString()}</span>
+          </div>
+        ) : (
+          <div class="text-sm text-gray-500 italic">Time TBA</div>
+        )
+      }
+    </div>
+
+    {
+      activity.equipment_needed && (
+        <div class="mt-4 border-t border-gray-200 pt-4">
+          <p class="text-xs text-gray-600">
+            <span class="font-semibold">Equipment needed:</span>{' '}
+            {activity.equipment_needed}
+          </p>
+        </div>
+      )
+    }
   </div>
 </div>

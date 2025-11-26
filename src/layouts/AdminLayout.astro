@@ -11,7 +11,7 @@ const { title = 'Admin - TwinkyMeet' } = Astro.props;
 export const prerender = false;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -25,20 +25,27 @@ export const prerender = false;
     <div class="flex h-screen overflow-hidden">
       <!-- Sidebar Navigation -->
       <div class="hidden md:flex md:flex-shrink-0">
-        <div class="flex flex-col w-64">
+        <div class="flex w-64 flex-col">
           <AdminNav />
         </div>
       </div>
 
       <!-- Main Content -->
-      <div class="flex-1 flex flex-col overflow-hidden">
+      <div class="flex flex-1 flex-col overflow-hidden">
         <!-- Top Bar -->
-        <header class="bg-white shadow-sm z-10">
-          <div class="px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+        <header class="z-10 bg-white shadow-sm">
+          <div
+            class="flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8"
+          >
             <h1 class="text-2xl font-semibold text-gray-900">{title}</h1>
             <div class="flex items-center space-x-4">
-              <a href="/" class="text-sm text-gray-600 hover:text-gray-900">View Site</a>
-              <button id="logout-button" class="text-sm text-red-600 hover:text-red-700 cursor-pointer">
+              <a href="/" class="text-sm text-gray-600 hover:text-gray-900"
+                >View Site</a
+              >
+              <button
+                id="logout-button"
+                class="cursor-pointer text-sm text-red-600 hover:text-red-700"
+              >
                 Logout
               </button>
             </div>
@@ -60,8 +67,8 @@ export const prerender = false;
           const response = await fetch('/api/admin/logout', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
-            }
+              'Content-Type': 'application/json',
+            },
           });
 
           // Redirect to login page regardless of response status

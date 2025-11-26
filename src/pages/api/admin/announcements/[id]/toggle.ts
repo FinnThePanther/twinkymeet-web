@@ -1,5 +1,8 @@
 import type { APIRoute } from 'astro';
-import { getAnnouncementById, toggleAnnouncementActive } from '../../../../../lib/db';
+import {
+  getAnnouncementById,
+  toggleAnnouncementActive,
+} from '../../../../../lib/db';
 
 export const prerender = false;
 
@@ -11,13 +14,13 @@ export const PATCH: APIRoute = async ({ params, request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Invalid announcement ID'
+          error: 'Invalid announcement ID',
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -28,13 +31,13 @@ export const PATCH: APIRoute = async ({ params, request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Announcement not found'
+          error: 'Announcement not found',
         }),
         {
           status: 404,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -46,13 +49,13 @@ export const PATCH: APIRoute = async ({ params, request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Active status must be a boolean value'
+          error: 'Active status must be a boolean value',
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
       );
     }
@@ -61,13 +64,13 @@ export const PATCH: APIRoute = async ({ params, request }) => {
 
     return new Response(
       JSON.stringify({
-        success: true
+        success: true,
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   } catch (error) {
@@ -75,13 +78,13 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to toggle announcement'
+        error: 'Failed to toggle announcement',
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
   }

@@ -12,40 +12,46 @@ const {
   image,
   caption,
   aspectRatio = 'landscape',
-  showCaptionOnHover = false
+  showCaptionOnHover = false,
 } = Astro.props;
 
 const aspectRatioClass = {
   square: 'aspect-square',
   landscape: 'aspect-video',
-  portrait: 'aspect-[3/4]'
+  portrait: 'aspect-[3/4]',
 }[aspectRatio];
 ---
 
-<div class="photo-card group relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 image-zoom">
+<div
+  class="photo-card group image-zoom relative overflow-hidden rounded-lg shadow-md transition-shadow duration-300 hover:shadow-xl"
+>
   <!-- Photo -->
   <div class={`w-full ${aspectRatioClass} overflow-hidden bg-gray-200`}>
     <Image
       src={image}
       alt={caption || 'TwinkyMeet photo'}
-      class="w-full h-full object-cover"
+      class="h-full w-full object-cover"
       widths={[400, 800]}
       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
     />
   </div>
 
   <!-- Caption -->
-  {caption && (
-    <div
-      class={`absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent transition-opacity duration-300 ${
-        showCaptionOnHover ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'
-      }`}
-    >
-      <p class="text-white text-sm md:text-base font-medium drop-shadow-lg">
-        {caption}
-      </p>
-    </div>
-  )}
+  {
+    caption && (
+      <div
+        class={`absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black to-transparent p-4 transition-opacity duration-300 ${
+          showCaptionOnHover
+            ? 'opacity-0 group-hover:opacity-100'
+            : 'opacity-100'
+        }`}
+      >
+        <p class="text-sm font-medium text-white drop-shadow-lg md:text-base">
+          {caption}
+        </p>
+      </div>
+    )
+  }
 </div>
 
 <style>

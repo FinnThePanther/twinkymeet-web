@@ -11,7 +11,7 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'RSVPs are currently closed'
+          error: 'RSVPs are currently closed',
         }),
         { status: 403, headers: { 'Content-Type': 'application/json' } }
       );
@@ -26,7 +26,7 @@ export const POST: APIRoute = async ({ request }) => {
       plus_one,
       arrival_time,
       departure_time,
-      excited_about
+      excited_about,
     } = body;
 
     // Validate required fields
@@ -52,7 +52,7 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           success: false,
           error: 'Validation failed',
-          details: errors
+          details: errors,
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
@@ -68,7 +68,8 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'An RSVP with this email already exists. If you need to make changes, please contact us.'
+          error:
+            'An RSVP with this email already exists. If you need to make changes, please contact us.',
         }),
         { status: 409, headers: { 'Content-Type': 'application/json' } }
       );
@@ -76,7 +77,8 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Validate optional fields if provided
     if (dietary_restrictions && dietary_restrictions.length > 500) {
-      errors.dietary_restrictions = 'Dietary restrictions must be less than 500 characters';
+      errors.dietary_restrictions =
+        'Dietary restrictions must be less than 500 characters';
     }
 
     if (excited_about && excited_about.length > 500) {
@@ -88,7 +90,7 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           success: false,
           error: 'Validation failed',
-          details: errors
+          details: errors,
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
@@ -103,7 +105,7 @@ export const POST: APIRoute = async ({ request }) => {
       arrival_time: arrival_time?.trim() || undefined,
       departure_time: departure_time?.trim() || undefined,
       excited_about: excited_about?.trim() || undefined,
-      payment_status: 'pending'
+      payment_status: 'pending',
     });
 
     // Return success response
@@ -112,17 +114,16 @@ export const POST: APIRoute = async ({ request }) => {
         success: true,
         message: 'RSVP submitted successfully',
         attendeeId: attendeeId,
-        email: trimmedEmail
+        email: trimmedEmail,
       }),
       { status: 201, headers: { 'Content-Type': 'application/json' } }
     );
-
   } catch (error) {
     console.error('Error processing RSVP:', error);
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Internal server error. Please try again later.'
+        error: 'Internal server error. Please try again later.',
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );

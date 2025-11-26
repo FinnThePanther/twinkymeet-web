@@ -11,11 +11,11 @@ export const GET: APIRoute = async () => {
     return new Response(
       JSON.stringify({
         success: true,
-        attendees
+        attendees,
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       }
     );
   } catch (error) {
@@ -23,11 +23,11 @@ export const GET: APIRoute = async () => {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to fetch RSVPs'
+        error: 'Failed to fetch RSVPs',
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       }
     );
   }

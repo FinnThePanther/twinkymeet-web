@@ -11,7 +11,11 @@ const location = getSetting('location') || 'Location TBD';
 
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr + 'T00:00:00');
-  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
 };
 
 // Try to import hero image
@@ -46,10 +50,13 @@ for (let i = 1; i <= 8; i++) {
 }
 
 // Get last year for memories section
-const lastYear = '2025'
+const lastYear = '2025';
 ---
 
-<BaseLayout title="About TwinkyMeet" description="Learn more about TwinkyMeet, our summer furry gathering">
+<BaseLayout
+  title="About TwinkyMeet"
+  description="Learn more about TwinkyMeet, our summer furry gathering"
+>
   <div class="bg-white">
     <!-- Hero Section -->
     <ImageHero
@@ -58,67 +65,82 @@ const lastYear = '2025'
       subtitle="Your guide to our summer gathering"
     />
 
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-
+    <div class="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
       <!-- What is TwinkyMeet -->
       <section class="mb-16">
-        <h2 class="text-3xl font-bold text-gray-900 mb-8">What is TwinkyMeet?</h2>
-        <div class="grid md:grid-cols-2 gap-8 items-start">
+        <h2 class="mb-8 text-3xl font-bold text-gray-900">
+          What is TwinkyMeet?
+        </h2>
+        <div class="grid items-start gap-8 md:grid-cols-2">
           <!-- Text Content -->
           <div class="prose prose-lg text-gray-600">
             <p>
-              TwinkyMeet is an intimate summer mini-convention bringing together a close-knit community
-              of furry friends for a long weekend of fun, creativity, and connection. With 15-20 attendees,
-              our gathering offers a perfect blend of organized activities and casual hangout time.
+              TwinkyMeet is an intimate summer mini-convention bringing together
+              a close-knit community of furry friends for a long weekend of fun,
+              creativity, and connection. With 15-20 attendees, our gathering
+              offers a perfect blend of organized activities and casual hangout
+              time.
             </p>
             <p>
-              Whether you're into gaming, outdoor adventures, creative workshops, or just relaxing with
-              friends, TwinkyMeet has something for everyone. Our welcoming atmosphere encourages both
-              participation and relaxation – join in on group activities or enjoy some downtime at your own pace.
+              Whether you're into gaming, outdoor adventures, creative
+              workshops, or just relaxing with friends, TwinkyMeet has something
+              for everyone. Our welcoming atmosphere encourages both
+              participation and relaxation – join in on group activities or
+              enjoy some downtime at your own pace.
             </p>
           </div>
 
           <!-- Community Photos Stack -->
-          {communityImages.length > 0 && (
-            <div class="space-y-4">
-              {communityImages.map((img, index) => {
-                const captions = [
-                  'Friends gathering and socializing',
-                  'Engaging activities and workshops',
-                  'Fursuit fun and community'
-                ];
-                return (
-                  <PhotoCard
-                    image={img}
-                    caption={captions[index]}
-                    aspectRatio="landscape"
-                  />
-                );
-              })}
-            </div>
-          )}
+          {
+            communityImages.length > 0 && (
+              <div class="space-y-4">
+                {communityImages.map((img, index) => {
+                  const captions = [
+                    'Friends gathering and socializing',
+                    'Engaging activities and workshops',
+                    'Fursuit fun and community',
+                  ];
+                  return (
+                    <PhotoCard
+                      image={img}
+                      caption={captions[index]}
+                      aspectRatio="landscape"
+                    />
+                  );
+                })}
+              </div>
+            )
+          }
         </div>
       </section>
 
       <!-- Event Details -->
-      <section class="mb-16 bg-primary-50 rounded-lg p-6 border-l-4 border-primary-600">
-        <h2 class="text-3xl font-bold text-gray-900 mb-6">Event Details</h2>
-        <div class="grid md:grid-cols-2 gap-6">
+      <section
+        class="bg-primary-50 border-primary-600 mb-16 rounded-lg border-l-4 p-6"
+      >
+        <h2 class="mb-6 text-3xl font-bold text-gray-900">Event Details</h2>
+        <div class="grid gap-6 md:grid-cols-2">
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">Dates</h3>
-            <p class="text-gray-600">{formatDate(eventDateStart)} - {formatDate(eventDateEnd)}</p>
+            <h3 class="mb-2 text-lg font-semibold text-gray-900">Dates</h3>
+            <p class="text-gray-600">
+              {formatDate(eventDateStart)} - {formatDate(eventDateEnd)}
+            </p>
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">Location</h3>
+            <h3 class="mb-2 text-lg font-semibold text-gray-900">Location</h3>
             <p class="text-gray-600">{location}</p>
-            <p class="text-sm text-gray-500 mt-1">Full address will be provided to confirmed attendees</p>
+            <p class="mt-1 text-sm text-gray-500">
+              Full address will be provided to confirmed attendees
+            </p>
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">Capacity</h3>
+            <h3 class="mb-2 text-lg font-semibold text-gray-900">Capacity</h3>
             <p class="text-gray-600">15-20 attendees</p>
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">Accommodations</h3>
+            <h3 class="mb-2 text-lg font-semibold text-gray-900">
+              Accommodations
+            </h3>
             <p class="text-gray-600">Shared venue with sleeping spaces</p>
           </div>
         </div>
@@ -126,61 +148,119 @@ const lastYear = '2025'
 
       <!-- What to Bring -->
       <section class="mb-16">
-        <h2 class="text-3xl font-bold text-gray-900 mb-6">What to Bring</h2>
-        <div class="grid md:grid-cols-2 gap-6">
+        <h2 class="mb-6 text-3xl font-bold text-gray-900">What to Bring</h2>
+        <div class="grid gap-6 md:grid-cols-2">
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-3">Essentials</h3>
+            <h3 class="mb-3 text-lg font-semibold text-gray-900">Essentials</h3>
             <ul class="space-y-2 text-gray-600">
               <li class="flex items-start">
-                <svg class="w-5 h-5 text-primary-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                <svg
+                  class="text-primary-600 mt-0.5 mr-2 h-5 w-5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"></path>
                 </svg>
                 Bedding and pillows (sheets, blankets, sleeping bag)
               </li>
               <li class="flex items-start">
-                <svg class="w-5 h-5 text-primary-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                <svg
+                  class="text-primary-600 mt-0.5 mr-2 h-5 w-5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"></path>
                 </svg>
                 Towels and toiletries
               </li>
               <li class="flex items-start">
-                <svg class="w-5 h-5 text-primary-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                <svg
+                  class="text-primary-600 mt-0.5 mr-2 h-5 w-5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"></path>
                 </svg>
                 Comfortable clothes and sleepwear
               </li>
               <li class="flex items-start">
-                <svg class="w-5 h-5 text-primary-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                <svg
+                  class="text-primary-600 mt-0.5 mr-2 h-5 w-5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"></path>
                 </svg>
                 Medications and any special needs items
               </li>
             </ul>
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-3">Optional But Fun</h3>
+            <h3 class="mb-3 text-lg font-semibold text-gray-900">
+              Optional But Fun
+            </h3>
             <ul class="space-y-2 text-gray-600">
               <li class="flex items-start">
-                <svg class="w-5 h-5 text-primary-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                <svg
+                  class="text-primary-600 mt-0.5 mr-2 h-5 w-5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"></path>
                 </svg>
                 Fursuit or costumes
               </li>
               <li class="flex items-start">
-                <svg class="w-5 h-5 text-primary-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                <svg
+                  class="text-primary-600 mt-0.5 mr-2 h-5 w-5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"></path>
                 </svg>
                 Board games, video games, or activities to share
               </li>
               <li class="flex items-start">
-                <svg class="w-5 h-5 text-primary-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                <svg
+                  class="text-primary-600 mt-0.5 mr-2 h-5 w-5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"></path>
                 </svg>
                 Snacks or treats to share with the group
               </li>
               <li class="flex items-start">
-                <svg class="w-5 h-5 text-primary-600 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                <svg
+                  class="text-primary-600 mt-0.5 mr-2 h-5 w-5 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"></path>
                 </svg>
                 Art supplies or craft materials
               </li>
@@ -191,85 +271,127 @@ const lastYear = '2025'
 
       <!-- Food Situation -->
       <section class="mb-16">
-        <h2 class="text-3xl font-bold text-gray-900 mb-6">Food Situation</h2>
+        <h2 class="mb-6 text-3xl font-bold text-gray-900">Food Situation</h2>
         <div class="prose prose-lg text-gray-600">
           <p>
-            We'll provide communal meals throughout the event. Please indicate any dietary restrictions
-            or allergies when you RSVP so we can accommodate everyone's needs.
+            We'll provide communal meals throughout the event. Please indicate
+            any dietary restrictions or allergies when you RSVP so we can
+            accommodate everyone's needs.
           </p>
-          <ul class="list-disc pl-6 space-y-2">
+          <ul class="list-disc space-y-2 pl-6">
             <li>Breakfast, lunch, and dinner will be provided</li>
             <li>Vegetarian, vegan, and other dietary options available</li>
             <li>Snacks and drinks available throughout the day</li>
-            <li>BYOB (Bring Your Own Beverages) if you have specific preferences</li>
+            <li>
+              BYOB (Bring Your Own Beverages) if you have specific preferences
+            </li>
             <li>Feel free to bring snacks to share with the group!</li>
           </ul>
         </div>
       </section>
 
       <!-- Code of Conduct -->
-      <section class="mb-16 border-l-4 border-primary-600 pl-6">
-        <h2 class="text-3xl font-bold text-gray-900 mb-6">Code of Conduct</h2>
+      <section class="border-primary-600 mb-16 border-l-4 pl-6">
+        <h2 class="mb-6 text-3xl font-bold text-gray-900">Code of Conduct</h2>
         <div class="prose prose-lg text-gray-600">
           <p class="font-semibold text-gray-900">
-            TwinkyMeet is committed to providing a welcoming, safe, and inclusive environment for all attendees.
+            TwinkyMeet is committed to providing a welcoming, safe, and
+            inclusive environment for all attendees.
           </p>
-          <h3 class="text-xl font-semibold text-gray-900 mt-4">Core Principles</h3>
-          <ul class="list-disc pl-6 space-y-2">
-            <li><strong>Respect:</strong> Treat all attendees with kindness and respect</li>
-            <li><strong>Consent:</strong> Always ask before physical contact, photos, or personal interactions</li>
-            <li><strong>Inclusivity:</strong> Welcome people of all backgrounds, identities, and experience levels</li>
-            <li><strong>Safety:</strong> Look out for each other and report concerns to organizers</li>
-            <li><strong>Communication:</strong> Be clear about boundaries and respect others' limits</li>
+          <h3 class="mt-4 text-xl font-semibold text-gray-900">
+            Core Principles
+          </h3>
+          <ul class="list-disc space-y-2 pl-6">
+            <li>
+              <strong>Respect:</strong> Treat all attendees with kindness and respect
+            </li>
+            <li>
+              <strong>Consent:</strong> Always ask before physical contact, photos,
+              or personal interactions
+            </li>
+            <li>
+              <strong>Inclusivity:</strong> Welcome people of all backgrounds, identities,
+              and experience levels
+            </li>
+            <li>
+              <strong>Safety:</strong> Look out for each other and report concerns
+              to organizers
+            </li>
+            <li>
+              <strong>Communication:</strong> Be clear about boundaries and respect
+              others' limits
+            </li>
           </ul>
           <p class="mt-4">
-            Harassment of any kind will not be tolerated. If you experience or witness any concerning
-            behavior, please contact an organizer immediately. We're here to ensure everyone has a great time!
+            Harassment of any kind will not be tolerated. If you experience or
+            witness any concerning behavior, please contact an organizer
+            immediately. We're here to ensure everyone has a great time!
           </p>
         </div>
       </section>
 
       <!-- Past Event Memories -->
-      {memoryImages.length > 0 && (
-        <section class="mb-16 -mx-4 sm:mx-0">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-4">
-            Memories from <span class="text-primary-600">{lastYear}</span>
-          </h2>
-          <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto px-4">
-            Here are some highlights from last year's gathering. Can't wait to make more memories together!
-          </p>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 px-4 sm:px-0">
-            {memoryImages.map((img) => (
-              <div class="image-zoom overflow-hidden rounded-lg" style="box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);">
-                <PhotoCard
-                  image={img}
-                  aspectRatio="square"
-                  showCaptionOnHover={false}
-                />
-              </div>
-            ))}
-          </div>
-          <div class="text-center mt-12">
-            <a href="/photos" class="inline-flex items-center text-accent-600 hover:text-accent-700 font-bold text-lg">
-              View Full Gallery
-              <svg class="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </a>
-          </div>
-        </section>
-      )}
+      {
+        memoryImages.length > 0 && (
+          <section class="-mx-4 mb-16 sm:mx-0">
+            <h2 class="mb-4 text-center text-3xl font-bold text-gray-900 md:text-4xl">
+              Memories from <span class="text-primary-600">{lastYear}</span>
+            </h2>
+            <p class="mx-auto mb-12 max-w-2xl px-4 text-center text-gray-600">
+              Here are some highlights from last year's gathering. Can't wait to
+              make more memories together!
+            </p>
+            <div class="grid grid-cols-2 gap-4 px-4 sm:px-0 md:grid-cols-4">
+              {memoryImages.map((img) => (
+                <div
+                  class="image-zoom overflow-hidden rounded-lg"
+                  style="box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);"
+                >
+                  <PhotoCard
+                    image={img}
+                    aspectRatio="square"
+                    showCaptionOnHover={false}
+                  />
+                </div>
+              ))}
+            </div>
+            <div class="mt-12 text-center">
+              <a
+                href="/photos"
+                class="text-accent-600 hover:text-accent-700 inline-flex items-center text-lg font-bold"
+              >
+                View Full Gallery
+                <svg
+                  class="ml-2 h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </a>
+            </div>
+          </section>
+        )
+      }
 
       <!-- Parking & Travel -->
       <section class="mb-16">
-        <h2 class="text-3xl font-bold text-gray-900 mb-6">Parking & Travel Information</h2>
+        <h2 class="mb-6 text-3xl font-bold text-gray-900">
+          Parking & Travel Information
+        </h2>
         <div class="prose prose-lg text-gray-600">
           <p>
-            Detailed parking and travel information will be provided to confirmed attendees.
-            Carpooling is encouraged! We'll set up a coordination system to help attendees connect
-            for shared rides.
+            Detailed parking and travel information will be provided to
+            confirmed attendees. Carpooling is encouraged! We'll set up a
+            coordination system to help attendees connect for shared rides.
           </p>
-          <ul class="list-disc pl-6 space-y-2">
+          <ul class="list-disc space-y-2 pl-6">
             <li>Ample parking available on-site</li>
             <li>Nearby airport information will be provided</li>
             <li>Carpooling coordination available</li>
@@ -279,16 +401,33 @@ const lastYear = '2025'
       </section>
 
       <!-- Contact -->
-      <section class="mb-16 bg-primary-50 rounded-lg p-6 border-l-4 border-accent-500">
-        <h2 class="text-3xl font-bold text-gray-900 mb-6">Contact Information</h2>
-        <p class="text-gray-600 mb-4">
+      <section
+        class="bg-primary-50 border-accent-500 mb-16 rounded-lg border-l-4 p-6"
+      >
+        <h2 class="mb-6 text-3xl font-bold text-gray-900">
+          Contact Information
+        </h2>
+        <p class="mb-4 text-gray-600">
           Have questions or concerns? We're here to help!
         </p>
         <div class="flex items-center text-gray-700">
-          <svg class="w-6 h-6 text-primary-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          <svg
+            class="text-primary-600 mr-3 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+            ></path>
           </svg>
-          <a href="mailto:info@twinkymeet.com" class="text-accent-600 hover:text-accent-700 font-bold">
+          <a
+            href="mailto:info@twinkymeet.com"
+            class="text-accent-600 hover:text-accent-700 font-bold"
+          >
             info@twinkymeet.com
           </a>
         </div>
@@ -296,95 +435,121 @@ const lastYear = '2025'
 
       <!-- FAQ -->
       <section class="mb-16">
-        <h2 class="text-3xl font-bold text-gray-900 mb-8">Frequently Asked Questions</h2>
+        <h2 class="mb-8 text-3xl font-bold text-gray-900">
+          Frequently Asked Questions
+        </h2>
         <div class="space-y-4">
-
-          <details class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-            <summary class="font-semibold text-gray-900 cursor-pointer">
+          <details
+            class="rounded-lg border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md"
+          >
+            <summary class="cursor-pointer font-semibold text-gray-900">
               Is this event 18+?
             </summary>
             <p class="mt-3 text-gray-600">
-              Yes, all attendees must be 18 years or older. Some activities may be marked as 18+ for mature content.
+              Yes, all attendees must be 18 years or older. Some activities may
+              be marked as 18+ for mature content.
             </p>
           </details>
 
-          <details class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-            <summary class="font-semibold text-gray-900 cursor-pointer">
+          <details
+            class="rounded-lg border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md"
+          >
+            <summary class="cursor-pointer font-semibold text-gray-900">
               How much does it cost?
             </summary>
             <p class="mt-3 text-gray-600">
-              Attendance fees cover venue rental, food, and supplies. Payment information and the exact amount
-              will be provided when you RSVP. We keep costs reasonable to make the event accessible to everyone!
+              Attendance fees cover venue rental, food, and supplies. Payment
+              information and the exact amount will be provided when you RSVP.
+              We keep costs reasonable to make the event accessible to everyone!
             </p>
           </details>
 
-          <details class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-            <summary class="font-semibold text-gray-900 cursor-pointer">
+          <details
+            class="rounded-lg border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md"
+          >
+            <summary class="cursor-pointer font-semibold text-gray-900">
               Can I bring a guest (+1)?
             </summary>
             <p class="mt-3 text-gray-600">
-              Due to our intimate group size, we ask that you check with organizers before bringing a guest.
-              There's a +1 option in the RSVP form – we'll follow up to discuss!
+              Due to our intimate group size, we ask that you check with
+              organizers before bringing a guest. There's a +1 option in the
+              RSVP form – we'll follow up to discuss!
             </p>
           </details>
 
-          <details class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-            <summary class="font-semibold text-gray-900 cursor-pointer">
+          <details
+            class="rounded-lg border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md"
+          >
+            <summary class="cursor-pointer font-semibold text-gray-900">
               What if I have dietary restrictions or allergies?
             </summary>
             <p class="mt-3 text-gray-600">
-              Please list all dietary restrictions and allergies in your RSVP form. We'll make sure to
-              accommodate your needs with appropriate meal options!
+              Please list all dietary restrictions and allergies in your RSVP
+              form. We'll make sure to accommodate your needs with appropriate
+              meal options!
             </p>
           </details>
 
-          <details class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-            <summary class="font-semibold text-gray-900 cursor-pointer">
+          <details
+            class="rounded-lg border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md"
+          >
+            <summary class="cursor-pointer font-semibold text-gray-900">
               Do I need to bring my fursuit?
             </summary>
             <p class="mt-3 text-gray-600">
-              Fursuits are completely optional! Bring yours if you'd like to suit up, but there's no
-              pressure. Many attendees don't have suits, and everyone is welcome either way.
+              Fursuits are completely optional! Bring yours if you'd like to
+              suit up, but there's no pressure. Many attendees don't have suits,
+              and everyone is welcome either way.
             </p>
           </details>
 
-          <details class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-            <summary class="font-semibold text-gray-900 cursor-pointer">
+          <details
+            class="rounded-lg border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md"
+          >
+            <summary class="cursor-pointer font-semibold text-gray-900">
               What's the schedule like?
             </summary>
             <p class="mt-3 text-gray-600">
-              We have a mix of organized activities and free time. You're welcome to participate in
-              everything or just the activities that interest you. Check out our <a href="/schedule" class="text-primary-600 hover:text-accent-700">schedule page</a>
+              We have a mix of organized activities and free time. You're
+              welcome to participate in everything or just the activities that
+              interest you. Check out our <a
+                href="/schedule"
+                class="text-primary-600 hover:text-accent-700">schedule page</a
+              >
               for the full lineup!
             </p>
           </details>
 
-          <details class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-            <summary class="font-semibold text-gray-900 cursor-pointer">
+          <details
+            class="rounded-lg border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md"
+          >
+            <summary class="cursor-pointer font-semibold text-gray-900">
               Can I suggest or host an activity?
             </summary>
             <p class="mt-3 text-gray-600">
               Absolutely! We encourage attendees to propose activities. Use our
-              <a href="/submit-activity" class="text-primary-600 hover:text-accent-700">activity submission form</a>
+              <a
+                href="/submit-activity"
+                class="text-primary-600 hover:text-accent-700"
+                >activity submission form</a
+              >
               to suggest something you'd like to host or participate in.
             </p>
           </details>
-
         </div>
       </section>
 
       <!-- CTA Section -->
-      <section class="text-center py-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">Ready to Join Us?</h2>
-        <p class="text-gray-600 mb-6">Reserve your spot at TwinkyMeet today!</p>
+      <section class="py-8 text-center">
+        <h2 class="mb-4 text-2xl font-bold text-gray-900">Ready to Join Us?</h2>
+        <p class="mb-6 text-gray-600">Reserve your spot at TwinkyMeet today!</p>
         <a
           href="/rsvp"
-          class="inline-block bg-accent-500 text-white px-8 py-3 rounded-lg font-bold hover:bg-accent-600 transition-all shadow-lg hover:shadow-xl hover-lift"
+          class="bg-accent-500 hover:bg-accent-600 hover-lift inline-block rounded-lg px-8 py-3 font-bold text-white shadow-lg transition-all hover:shadow-xl"
         >
           RSVP Now
         </a>
       </section>
-
     </div>
   </div>
 </BaseLayout>

@@ -1,0 +1,18 @@
+# Components with script tag parsing issues
+src/components/ImageHero.astro
+
+# Build outputs
+dist/
+.astro/
+
+# Dependencies
+node_modules/
+
+# Images and media
+src/images/
+public/images/
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
