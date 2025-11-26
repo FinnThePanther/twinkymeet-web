@@ -28,9 +28,11 @@ const {
   <body class="min-h-screen flex flex-col bg-gray-50">
     <Header />
     <AnnouncementBanner />
-    <main class="flex-1">
+    <main class="flex-1 relative z-10">
       <slot />
     </main>
-    <Footer />
+    <div class="relative z-10">
+      <Footer />
+    </div>
   </body>
 </html>

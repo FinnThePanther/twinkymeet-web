@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ImageHero from '../components/ImageHero.astro';
 import PhotoCard from '../components/PhotoCard.astro';
@@ -57,10 +58,41 @@ for (let i = 1; i <= 3; i++) {
     // Image not found, skip it
   }
 }
+
+// Import community background photo
+let communityPhoto;
+try {
+  communityPhoto = await import('../images/gallery/community-social.jpg');
+} catch {
+  communityPhoto = undefined;
+}
 ---
 
 <BaseLayout title="TwinkyMeet - Home">
-	<div class="bg-gradient-to-b from-primary-50 to-white">
+	<div class="relative">
+		<!-- Fixed background photo with overlay -->
+		<div class="fixed inset-0 -z-10 top-0">
+			{communityPhoto?.default && (
+				<>
+					<Image
+						src={communityPhoto.default}
+						alt="TwinkyMeet community gathering"
+						class="w-full h-full object-cover"
+						widths={[640, 1024, 1920, 2560]}
+						sizes="100vw"
+						loading="eager"
+					/>
+					<!-- Teal overlay -->
+					<div class="absolute inset-0 bg-primary-500 opacity-85 md:opacity-75"></div>
+				</>
+			)}
+			{!communityPhoto?.default && (
+				<div class="absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-800"></div>
+			)}
+		</div>
+
+		<!-- Content (positioned above background) -->
+		<div class="relative z-0">
 		<!-- Hero Section with ImageHero Component -->
 		<ImageHero
 			image={heroImage?.default}
@@ -105,7 +137,7 @@ for (let i = 1; i <= 3; i++) {
 		{highlightImages.length > 0 && (
 			<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 				<h2 class="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12">
-					Moments from <span class="text-primary-600">TwinkyMeet</span>
+					Moments from <span class="text-accent-600">TwinkyMeet</span>
 				</h2>
 				<div class="grid md:grid-cols-3 gap-6">
 					{highlightImages.map((img, index) => {
@@ -129,7 +161,7 @@ for (let i = 1; i <= 3; i++) {
 		<!-- Quick Info Section -->
 		<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 			<div class="grid md:grid-cols-3 gap-8">
-				<div class="bg-white p-6 rounded-lg hover-lift border-l-4 border-primary-500" style="box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.1);">
+				<div class="bg-white/95 p-6 rounded-lg hover-lift border-l-4 border-primary-500" style="box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.1);">
 					<div class="text-primary-600 mb-3">
 						<svg class="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -142,7 +174,7 @@ for (let i = 1; i <= 3; i++) {
 					</div>
 				</div>
 
-				<div class="bg-white p-6 rounded-lg hover-lift border-l-4 border-primary-500" style="box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.1);">
+				<div class="bg-white/95 p-6 rounded-lg hover-lift border-l-4 border-primary-500" style="box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.1);">
 					<div class="text-primary-600 mb-3">
 						<svg class="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -155,7 +187,7 @@ for (let i = 1; i <= 3; i++) {
 					</div>
 				</div>
 
-				<div class="bg-white p-6 rounded-lg hover-lift border-l-4 border-primary-500" style="box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.1);">
+				<div class="bg-white/95 p-6 rounded-lg hover-lift border-l-4 border-primary-500" style="box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.1);">
 					<div class="text-primary-600 mb-3">
 						<svg class="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
@@ -194,5 +226,6 @@ for (let i = 1; i <= 3; i++) {
 				</div>
 			</section>
 		)}
+		</div>
 	</div>
 </BaseLayout>
