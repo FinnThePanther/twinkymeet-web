@@ -38,7 +38,7 @@ const scheduledActivities = getAllActivities('scheduled').slice(0, 3);
 // Try to import hero image (will use gradient fallback if not present)
 let heroImage;
 try {
-  heroImage = await import('../images/hero/home-hero.jpg');
+  heroImage = await import('../images/featured-2.jpg');
 } catch {
   heroImage = undefined;
 }
@@ -47,7 +47,7 @@ try {
 let highlightImages = [];
 for (let i = 1; i <= 3; i++) {
   try {
-    const img = await import(`../images/highlights/moment-${i}.jpg`);
+    const img = await import(`../images/moment-${i}.jpg`);
     highlightImages.push(img.default);
   } catch {
     // Image not found, skip it
@@ -58,7 +58,7 @@ for (let i = 1; i <= 3; i++) {
 let featuredImages = [];
 for (let i = 1; i <= 3; i++) {
   try {
-    const img = await import(`../images/activities/featured-${i}.jpg`);
+    const img = await import(`../images/featured-${i}.jpg`);
     featuredImages.push(img.default);
   } catch {
     // Image not found, skip it
@@ -68,7 +68,7 @@ for (let i = 1; i <= 3; i++) {
 // Import community background photo
 let communityPhoto;
 try {
-  communityPhoto = await import('../images/gallery/community-social.jpg');
+  communityPhoto = await import('../images/community-activities.jpg');
 } catch {
   communityPhoto = undefined;
 }
@@ -84,7 +84,7 @@ try {
             <Image
               src={communityPhoto.default}
               alt="TwinkyMeet community gathering"
-              class="h-full w-full object-cover"
+              class="h-full w-full object-cover object-top"
               widths={[640, 1024, 1920, 2560]}
               sizes="100vw"
               loading="eager"
@@ -106,8 +106,8 @@ try {
       <!-- Hero Section with ImageHero Component -->
       <ImageHero
         image={heroImage?.default}
-        title="Welcome to TwinkyMeet"
-        subtitle="A summer mini-convention for our close-knit furry community gathering"
+        title="TwinkyMeet 2026: Twinkies in the Rockies!"
+        subtitle="A summer gathering for members of the TwinkyArts family"
         showCountdown={true}
       >
         <!-- Event Details -->
@@ -160,7 +160,7 @@ try {
             href="/submit-activity"
             class="text-primary-700 hover:bg-primary-50 inline-block rounded-lg border-2 border-white bg-white px-8 py-3 font-bold transition-all"
           >
-            Submit Activity
+            Submit an Activity
           </a>
         </div>
       </ImageHero>
@@ -168,39 +168,6 @@ try {
       <!-- Quick Info Section -->
       <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div class="grid gap-8 md:grid-cols-3">
-          <div
-            class="hover-lift border-primary-500 rounded-lg border-l-4 bg-white/95 p-6"
-            style="box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.1);"
-          >
-            <div class="text-primary-600 mb-3">
-              <svg
-                class="mx-auto h-12 w-12"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <h3 class="mb-2 text-center text-xl font-semibold text-gray-900">
-              View Schedule
-            </h3>
-            <p class="mb-4 text-center text-gray-600">
-              Check out the planned activities and events
-            </p>
-            <div class="text-center">
-              <a
-                href="/schedule"
-                class="text-accent-600 hover:text-accent-700 font-semibold"
-                >View Schedule →</a
-              >
-            </div>
-          </div>
-
           <div
             class="hover-lift border-primary-500 rounded-lg border-l-4 bg-white/95 p-6"
             style="box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.1);"
@@ -250,6 +217,39 @@ try {
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="mb-2 text-center text-xl font-semibold text-gray-900">
+              View Schedule
+            </h3>
+            <p class="mb-4 text-center text-gray-600">
+              Check out the planned activities and events
+            </p>
+            <div class="text-center">
+              <a
+                href="/schedule"
+                class="text-accent-600 hover:text-accent-700 font-semibold"
+                >View Schedule →</a
+              >
+            </div>
+          </div>
+
+          <div
+            class="hover-lift border-primary-500 rounded-lg border-l-4 bg-white/95 p-6"
+            style="box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.1);"
+          >
+            <div class="text-primary-600 mb-3">
+              <svg
+                class="mx-auto h-12 w-12"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
                   d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"
                 ></path>
               </svg>
@@ -280,7 +280,7 @@ try {
       </div>
 
       <!-- Photo Highlights Section -->
-      {
+      <!-- {
         highlightImages.length > 0 && (
           <section class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
             <h2 class="mb-12 text-center text-3xl font-bold text-gray-900 md:text-4xl">
@@ -304,7 +304,7 @@ try {
             </div>
           </section>
         )
-      }
+      } -->
 
       <!-- Featured Activities -->
       {

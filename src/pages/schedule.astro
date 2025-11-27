@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ImageHero from '../components/ImageHero.astro';
+import ImageHeroSchedule from '../components/ImageHeroSchedule.astro';
 import ScheduleItem from '../components/ScheduleItem.astro';
 import { getScheduledActivities } from '../lib/db';
 
@@ -49,7 +49,7 @@ const upcomingActivities = activities
 // Try to import hero image
 let heroImage;
 try {
-  heroImage = await import('../images/hero/schedule-hero.jpg');
+  heroImage = await import('../images/featured-1.jpg');
 } catch {
   heroImage = undefined;
 }
@@ -61,7 +61,7 @@ try {
 >
   <div class="min-h-screen bg-gray-50">
     <!-- Hero Section -->
-    <ImageHero
+    <ImageHeroSchedule
       image={heroImage?.default}
       title="Event Schedule"
       subtitle="Check out what's planned for TwinkyMeet"

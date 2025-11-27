@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ImageHero from '../components/ImageHero.astro';
+import ImageHeroActivities from '../components/ImageHeroActivities.astro';
 import ActivityCard from '../components/ActivityCard.astro';
 import { getApprovedAndScheduledActivities } from '../lib/db';
 
@@ -21,7 +21,7 @@ activityTypes.forEach((type) => {
 // Try to import hero image
 let heroImage;
 try {
-  heroImage = await import('../images/hero/activities-hero.jpg');
+  heroImage = await import('../images/community-social.jpg');
 } catch {
   heroImage = undefined;
 }
@@ -33,7 +33,7 @@ try {
 >
   <div class="min-h-screen bg-gray-50">
     <!-- Hero Section -->
-    <ImageHero
+    <ImageHeroActivities
       image={heroImage?.default}
       title="Activities"
       subtitle="Explore all the fun activities planned for the event"
