@@ -5,8 +5,7 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ locals }) => {
   try {
-    const db = locals.runtime.env.DB;
-    const settings = await getAllSettings(db);
+    const settings = getAllSettings();
 
     // Convert array of settings to object for easier access
     const settingsObj: Record<string, string> = {};
@@ -45,7 +44,6 @@ export const GET: APIRoute = async ({ locals }) => {
 
 export const PUT: APIRoute = async ({ request, locals }) => {
   try {
-    const db = locals.runtime.env.DB;
     const body = await request.json();
     const {
       event_date_start,
@@ -145,21 +143,21 @@ export const PUT: APIRoute = async ({ request, locals }) => {
 
     // Update settings
     if (event_date_start !== undefined) {
-      await setSetting(db, 'event_date_start', event_date_start);
+      setSetting('event_date_start', event_date_start);
     }
 
     if (event_date_end !== undefined) {
-      await setSetting(db, 'event_date_end', event_date_end);
+      setSetting('event_date_end', event_date_end);
     }
 
     if (location !== undefined) {
-      await setSetting(db, 'location', location.trim());
+      setSetting('location', location.trim());
     }
 
     if (rsvp_open !== undefined) {
       const value =
         typeof rsvp_open === 'boolean' ? rsvp_open.toString() : rsvp_open;
-      await setSetting(db, 'rsvp_open', value);
+      setSetting('rsvp_open', value);
     }
 
     if (activity_submissions_open !== undefined) {
@@ -167,11 +165,11 @@ export const PUT: APIRoute = async ({ request, locals }) => {
         typeof activity_submissions_open === 'boolean'
           ? activity_submissions_open.toString()
           : activity_submissions_open;
-      await setSetting(db, 'activity_submissions_open', value);
+      setSetting('activity_submissions_open', value);
     }
 
     // Fetch updated settings
-    const settings = await getAllSettings(db);
+    const settings = getAllSettings();
     const settingsObj: Record<string, string> = {};
     settings.forEach((setting) => {
       settingsObj[setting.key] = setting.value;

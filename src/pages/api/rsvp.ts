@@ -5,10 +5,8 @@ export const prerender = false;
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    const db = locals.runtime.env.DB;
-
     // Check if RSVPs are open
-    const rsvpOpen = await getSetting(db, 'rsvp_open');
+    const rsvpOpen = getSetting('rsvp_open');
     if (rsvpOpen !== 'true') {
       return new Response(
         JSON.stringify({
@@ -65,7 +63,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const trimmedName = name.trim();
 
     // Check for duplicate email
-    const existingAttendee = await getAttendeeByEmail(db, trimmedEmail);
+    const existingAttendee = getAttendeeByEmail(trimmedEmail);
     if (existingAttendee) {
       return new Response(
         JSON.stringify({
@@ -99,7 +97,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Insert attendee into database
-    const attendeeId = await insertAttendee(db, {
+    const attendeeId = insertAttendee({
       name: trimmedName,
       email: trimmedEmail,
       dietary_restrictions: dietary_restrictions?.trim() || undefined,

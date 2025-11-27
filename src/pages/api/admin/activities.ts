@@ -5,16 +5,14 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ url, locals }) => {
   try {
-    const db = locals.runtime.env.DB;
     // Optional status filter via query param
     const status = url.searchParams.get('status');
 
     const activities = status
-      ? await getAllActivities(
-          db,
+      ? getAllActivities(
           status as 'pending' | 'approved' | 'scheduled' | 'cancelled'
         )
-      : await getAllActivities(db);
+      : getAllActivities();
 
     return new Response(
       JSON.stringify({

@@ -5,7 +5,6 @@ export const prerender = false;
 
 export const PATCH: APIRoute = async ({ params, locals }) => {
   try {
-    const db = locals.runtime.env.DB;
     const id = parseInt(params.id || '0', 10);
 
     if (isNaN(id) || id <= 0) {
@@ -23,7 +22,7 @@ export const PATCH: APIRoute = async ({ params, locals }) => {
       );
     }
 
-    const existingActivity = await getActivityById(db, id);
+    const existingActivity = getActivityById(id);
 
     if (!existingActivity) {
       return new Response(
@@ -41,9 +40,9 @@ export const PATCH: APIRoute = async ({ params, locals }) => {
     }
 
     // Update status to 'approved'
-    await updateActivity(db, id, { status: 'approved' });
+    updateActivity(id, { status: 'approved' });
 
-    const updatedActivity = await getActivityById(db, id);
+    const updatedActivity = getActivityById(id);
 
     return new Response(
       JSON.stringify({

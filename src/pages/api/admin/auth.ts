@@ -15,8 +15,6 @@ export const prerender = false;
 
 export const POST: APIRoute = async ({ request, clientAddress, locals }) => {
   try {
-    const db = locals.runtime.env.DB;
-
     // Get client IP address (use clientAddress or fallback to header)
     const ipAddress =
       clientAddress ||
@@ -24,7 +22,7 @@ export const POST: APIRoute = async ({ request, clientAddress, locals }) => {
       'unknown';
 
     // Check if IP is currently locked out
-    if (await isIpLocked(db, ipAddress)) {
+    if (isIpLocked(ipAddress)) {
       return new Response(
         JSON.stringify({
           success: false,
@@ -61,7 +59,7 @@ export const POST: APIRoute = async ({ request, clientAddress, locals }) => {
     }
 
     // Get admin password hash from environment
-    const adminPasswordHash = locals.runtime.env.ADMIN_PASSWORD_HASH;
+    const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH || '';
 
     if (!adminPasswordHash) {
       console.error('ADMIN_PASSWORD_HASH environment variable is not set');
@@ -83,8 +81,8 @@ export const POST: APIRoute = async ({ request, clientAddress, locals }) => {
 
     if (!isValid) {
       // Record failed login attempt
-      const isLocked = await recordFailedLogin(db, ipAddress);
-      const remainingAttempts = await getRemainingAttempts(db, ipAddress);
+      const isLocked = recordFailedLogin(ipAddress);
+      const remainingAttempts = getRemainingAttempts(ipAddress);
 
       const errorMessage = isLocked
         ? 'Too many failed login attempts. You have been locked out for 15 minutes.'
@@ -103,10 +101,10 @@ export const POST: APIRoute = async ({ request, clientAddress, locals }) => {
     }
 
     // Password is valid - clear any failed attempts
-    await clearLoginAttempts(db, ipAddress);
+    clearLoginAttempts(ipAddress);
 
     // Get session secret
-    const sessionSecret = locals.runtime.env.SESSION_SECRET;
+    const sessionSecret = process.env.SESSION_SECRET || '';
     if (!sessionSecret) {
       console.error('SESSION_SECRET environment variable is not set');
       return new Response(

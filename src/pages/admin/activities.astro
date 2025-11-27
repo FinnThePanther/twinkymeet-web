@@ -7,7 +7,7 @@ export const prerender = false;
 
 // Check authentication
 const sessionCookie = Astro.cookies.get('session')?.value;
-const sessionSecret = (Astro.locals.runtime?.env?.SESSION_SECRET as string) || '';
+const sessionSecret = process.env.SESSION_SECRET || '';
 const isAuthenticated =
   sessionCookie && sessionSecret && verifySessionToken(sessionCookie, sessionSecret);
 
@@ -16,8 +16,7 @@ if (!isAuthenticated) {
 }
 
 // Fetch all activities
-const db = Astro.locals.runtime.env.DB;
-const activities = await getAllActivities(db);
+const activities = getAllActivities();
 ---
 
 <AdminLayout title="Manage Activities">

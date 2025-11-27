@@ -4,13 +4,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ImageHeroAbout from '../components/ImageHeroAbout.astro';
 import { getSetting } from '../lib/db';
 
-// Get database instance
-const db = Astro.locals.runtime.env.DB;
-
 // Fetch event details from settings
-const eventDateStart = (await getSetting(db, 'event_date_start')) || '2026-07-01';
-const eventDateEnd = (await getSetting(db, 'event_date_end')) || '2026-07-05';
-const location = (await getSetting(db, 'location')) || 'Location TBD';
+const eventDateStart = getSetting('event_date_start') || '2026-07-01';
+const eventDateEnd = getSetting('event_date_end') || '2026-07-05';
+const location = getSetting('location') || 'Location TBD';
 
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr + 'T00:00:00');

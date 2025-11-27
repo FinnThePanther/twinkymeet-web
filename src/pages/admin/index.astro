@@ -6,10 +6,11 @@ import {
   getActiveAnnouncements,
 } from '../../lib/db';
 import { verifySessionToken } from '../../lib/auth';
+import type { Attendee } from '../../lib/db';
 
 // Authentication check - redirect if not authenticated
 const sessionCookie = Astro.cookies.get('session')?.value;
-const sessionSecret = (Astro.locals.runtime?.env?.SESSION_SECRET as string) || '';
+const sessionSecret = process.env.SESSION_SECRET || '';
 const isAuthenticated =
   sessionCookie && sessionSecret && verifySessionToken(sessionCookie, sessionSecret);
 
@@ -18,51 +19,20 @@ if (!isAuthenticated) {
 }
 
 // Get statistics
-const db = Astro.locals.runtime.env.DB;
-
-// Count RSVPs
-const rsvpResult = (await db
-  .prepare('SELECT COUNT(*) as count FROM attendees')
-  .first()) as { count: number };
-const rsvpCount = rsvpResult.count;
+const allAttendees = getAllAttendees();
+const rsvpCount = allAttendees.length;
 
 // Count activities by status
-const pendingResult = (await db
-  .prepare('SELECT COUNT(*) as count FROM activities WHERE status = ?')
-  .bind('pending')
-  .first()) as { count: number };
-const approvedResult = (await db
-  .prepare('SELECT COUNT(*) as count FROM activities WHERE status = ?')
-  .bind('approved')
-  .first()) as { count: number };
-const scheduledResult = (await db
-  .prepare('SELECT COUNT(*) as count FROM activities WHERE status = ?')
-  .bind('scheduled')
-  .first()) as { count: number };
+const allActivities = getAllActivities();
+const pendingCount = allActivities.filter(a => a.status === 'pending').length;
+const approvedCount = allActivities.filter(a => a.status === 'approved').length;
+const scheduledCount = allActivities.filter(a => a.status === 'scheduled').length;
 
-const pendingCount = pendingResult.count;
-const approvedCount = approvedResult.count;
-const scheduledCount = scheduledResult.count;
-
-// Get recent RSVPs
-const recentRsvpsResult = await db
-  .prepare(
-    `
-  SELECT name, email, created_at
-  FROM attendees
-  ORDER BY created_at DESC
-  LIMIT 5
-`
-  )
-  .all();
-const recentRsvps = recentRsvpsResult.results as Array<{
-  name: string;
-  email: string;
-  created_at: string;
-}>;
+// Get recent RSVPs (first 5)
+const recentRsvps = allAttendees.slice(0, 5);
 
 // Get active announcements
-const announcements = await getActiveAnnouncements(db);
+const announcements = getActiveAnnouncements();
 
 // Format date helper
 function formatDate(dateStr: string): string {

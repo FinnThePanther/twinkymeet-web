@@ -8,7 +8,6 @@ export const prerender = false;
 
 export const PATCH: APIRoute = async ({ params, request, locals }) => {
   try {
-    const db = locals.runtime.env.DB;
     const id = parseInt(params.id || '0', 10);
 
     if (isNaN(id) || id <= 0) {
@@ -26,7 +25,7 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
       );
     }
 
-    const existingAnnouncement = await getAnnouncementById(db, id);
+    const existingAnnouncement = getAnnouncementById(id);
 
     if (!existingAnnouncement) {
       return new Response(
@@ -61,7 +60,7 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
       );
     }
 
-    await toggleAnnouncementActive(db, id, active);
+    toggleAnnouncementActive(id, active);
 
     return new Response(
       JSON.stringify({

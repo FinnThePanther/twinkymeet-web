@@ -5,7 +5,7 @@ import { verifySessionToken } from '../../lib/auth';
 
 // Authentication check - redirect if not authenticated
 const sessionCookie = Astro.cookies.get('session')?.value;
-const sessionSecret = (Astro.locals.runtime?.env?.SESSION_SECRET as string) || '';
+const sessionSecret = process.env.SESSION_SECRET || '';
 const isAuthenticated =
   sessionCookie && sessionSecret && verifySessionToken(sessionCookie, sessionSecret);
 
@@ -14,8 +14,7 @@ if (!isAuthenticated) {
 }
 
 // Get all attendees
-const db = Astro.locals.runtime.env.DB;
-const attendees = await getAllAttendees(db);
+const attendees = getAllAttendees();
 
 // Format date helper
 function formatDate(dateStr: string): string {

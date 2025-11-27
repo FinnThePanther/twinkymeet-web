@@ -5,7 +5,6 @@ export const prerender = false;
 
 export const PATCH: APIRoute = async ({ params, request, locals }) => {
   try {
-    const db = locals.runtime.env.DB;
     const id = parseInt(params.id || '0', 10);
 
     if (isNaN(id) || id <= 0) {
@@ -23,7 +22,7 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
       );
     }
 
-    const existingActivity = await getActivityById(db, id);
+    const existingActivity = getActivityById(id);
 
     if (!existingActivity) {
       return new Response(
@@ -99,14 +98,14 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
     }
 
     // Update activity with schedule information and set status to 'scheduled'
-    await updateActivity(db, id, {
+    updateActivity(id, {
       scheduled_start,
       scheduled_end,
       location: location.trim(),
       status: 'scheduled',
     });
 
-    const updatedActivity = await getActivityById(db, id);
+    const updatedActivity = getActivityById(id);
 
     return new Response(
       JSON.stringify({

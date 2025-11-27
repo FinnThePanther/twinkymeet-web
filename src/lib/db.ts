@@ -1,4 +1,37 @@
-import type { D1Database } from '@cloudflare/workers-types';
+import Database from 'better-sqlite3';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+const dbPath = process.env.DATABASE_PATH || join(process.cwd(), 'db', 'local.db');
+
+let db: Database.Database | null = null;
+
+export function getDb(): Database.Database {
+  if (!db) {
+    db = new Database(dbPath);
+    db.pragma('journal_mode = WAL');
+    initializeDatabase();
+  }
+  return db;
+}
+
+function initializeDatabase() {
+  const schemaPath = join(process.cwd(), 'db', 'schema.sql');
+  try {
+    const schema = readFileSync(schemaPath, 'utf-8');
+    getDb().exec(schema);
+  } catch (error) {
+    // Schema already applied or error
+    console.log('Database initialization:', error instanceof Error ? error.message : 'Schema may already be applied');
+  }
+}
+
+export function closeDb() {
+  if (db) {
+    db.close();
+    db = null;
+  }
+}
 
 // Type definitions for database records
 export interface Attendee {
@@ -61,69 +94,42 @@ export interface LoginAttempt {
 }
 
 // Attendee operations
-export async function insertAttendee(
-  db: D1Database,
-  attendee: Attendee
-): Promise<number> {
-  const result = await db
-    .prepare(
-      `
+export function insertAttendee(attendee: Attendee): number {
+  const stmt = getDb().prepare(`
     INSERT INTO attendees (name, email, dietary_restrictions, plus_one, arrival_time, departure_time, excited_about, payment_status)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `
-    )
-    .bind(
-      attendee.name,
-      attendee.email,
-      attendee.dietary_restrictions || null,
-      attendee.plus_one || 0,
-      attendee.arrival_time || null,
-      attendee.departure_time || null,
-      attendee.excited_about || null,
-      attendee.payment_status || 'pending'
-    )
-    .run();
+  `);
 
-  return result.meta.last_row_id;
+  const result = stmt.run(
+    attendee.name,
+    attendee.email,
+    attendee.dietary_restrictions || null,
+    attendee.plus_one || 0,
+    attendee.arrival_time || null,
+    attendee.departure_time || null,
+    attendee.excited_about || null,
+    attendee.payment_status || 'pending'
+  );
+
+  return result.lastInsertRowid as number;
 }
 
-export async function getAttendeeByEmail(
-  db: D1Database,
-  email: string
-): Promise<Attendee | null> {
-  const result = await db
-    .prepare('SELECT * FROM attendees WHERE email = ?')
-    .bind(email)
-    .first<Attendee>();
-
-  return result;
+export function getAttendeeByEmail(email: string): Attendee | undefined {
+  const stmt = getDb().prepare('SELECT * FROM attendees WHERE email = ?');
+  return stmt.get(email) as Attendee | undefined;
 }
 
-export async function getAttendeeById(
-  db: D1Database,
-  id: number
-): Promise<Attendee | null> {
-  const result = await db
-    .prepare('SELECT * FROM attendees WHERE id = ?')
-    .bind(id)
-    .first<Attendee>();
-
-  return result;
+export function getAttendeeById(id: number): Attendee | undefined {
+  const stmt = getDb().prepare('SELECT * FROM attendees WHERE id = ?');
+  return stmt.get(id) as Attendee | undefined;
 }
 
-export async function getAllAttendees(db: D1Database): Promise<Attendee[]> {
-  const { results } = await db
-    .prepare('SELECT * FROM attendees ORDER BY created_at DESC')
-    .all<Attendee>();
-
-  return results;
+export function getAllAttendees(): Attendee[] {
+  const stmt = getDb().prepare('SELECT * FROM attendees ORDER BY created_at DESC');
+  return stmt.all() as Attendee[];
 }
 
-export async function updateAttendee(
-  db: D1Database,
-  id: number,
-  updates: Partial<Attendee>
-): Promise<void> {
+export function updateAttendee(id: number, updates: Partial<Attendee>): void {
   const fields = Object.keys(updates)
     .filter((key) => key !== 'id' && key !== 'created_at')
     .map((key) => `${key} = ?`)
@@ -133,84 +139,54 @@ export async function updateAttendee(
     .filter((key) => key !== 'id' && key !== 'created_at')
     .map((key) => updates[key as keyof Attendee]);
 
-  await db
-    .prepare(`UPDATE attendees SET ${fields} WHERE id = ?`)
-    .bind(...values, id)
-    .run();
+  const stmt = getDb().prepare(`UPDATE attendees SET ${fields} WHERE id = ?`);
+  stmt.run(...values, id);
 }
 
-export async function deleteAttendee(
-  db: D1Database,
-  id: number
-): Promise<void> {
-  await db.prepare('DELETE FROM attendees WHERE id = ?').bind(id).run();
+export function deleteAttendee(id: number): void {
+  const stmt = getDb().prepare('DELETE FROM attendees WHERE id = ?');
+  stmt.run(id);
 }
 
 // Activity operations
-export async function insertActivity(
-  db: D1Database,
-  activity: Activity
-): Promise<number> {
-  const result = await db
-    .prepare(
-      `
+export function insertActivity(activity: Activity): number {
+  const stmt = getDb().prepare(`
     INSERT INTO activities (title, description, host_name, host_email, duration, equipment_needed, capacity, time_preference, activity_type, status)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `
-    )
-    .bind(
-      activity.title,
-      activity.description || null,
-      activity.host_name,
-      activity.host_email || null,
-      activity.duration || null,
-      activity.equipment_needed || null,
-      activity.capacity || null,
-      activity.time_preference || null,
-      activity.activity_type || null,
-      activity.status || 'pending'
-    )
-    .run();
+  `);
 
-  return result.meta.last_row_id;
+  const result = stmt.run(
+    activity.title,
+    activity.description || null,
+    activity.host_name,
+    activity.host_email || null,
+    activity.duration || null,
+    activity.equipment_needed || null,
+    activity.capacity || null,
+    activity.time_preference || null,
+    activity.activity_type || null,
+    activity.status || 'pending'
+  );
+
+  return result.lastInsertRowid as number;
 }
 
-export async function getAllActivities(
-  db: D1Database,
-  status?: string
-): Promise<Activity[]> {
+export function getAllActivities(status?: string): Activity[] {
   if (status) {
-    const { results } = await db
-      .prepare('SELECT * FROM activities WHERE status = ? ORDER BY created_at DESC')
-      .bind(status)
-      .all<Activity>();
-    return results;
+    const stmt = getDb().prepare('SELECT * FROM activities WHERE status = ? ORDER BY created_at DESC');
+    return stmt.all(status) as Activity[];
   }
 
-  const { results } = await db
-    .prepare('SELECT * FROM activities ORDER BY created_at DESC')
-    .all<Activity>();
-
-  return results;
+  const stmt = getDb().prepare('SELECT * FROM activities ORDER BY created_at DESC');
+  return stmt.all() as Activity[];
 }
 
-export async function getActivityById(
-  db: D1Database,
-  id: number
-): Promise<Activity | null> {
-  const result = await db
-    .prepare('SELECT * FROM activities WHERE id = ?')
-    .bind(id)
-    .first<Activity>();
-
-  return result;
+export function getActivityById(id: number): Activity | undefined {
+  const stmt = getDb().prepare('SELECT * FROM activities WHERE id = ?');
+  return stmt.get(id) as Activity | undefined;
 }
 
-export async function updateActivity(
-  db: D1Database,
-  id: number,
-  updates: Partial<Activity>
-): Promise<void> {
+export function updateActivity(id: number, updates: Partial<Activity>): void {
   const fields = Object.keys(updates)
     .filter((key) => key !== 'id' && key !== 'created_at')
     .map((key) => `${key} = ?`)
@@ -220,153 +196,86 @@ export async function updateActivity(
     .filter((key) => key !== 'id' && key !== 'created_at')
     .map((key) => updates[key as keyof Activity]);
 
-  await db
-    .prepare(`UPDATE activities SET ${fields} WHERE id = ?`)
-    .bind(...values, id)
-    .run();
+  const stmt = getDb().prepare(`UPDATE activities SET ${fields} WHERE id = ?`);
+  stmt.run(...values, id);
 }
 
-export async function deleteActivity(
-  db: D1Database,
-  id: number
-): Promise<void> {
-  await db.prepare('DELETE FROM activities WHERE id = ?').bind(id).run();
+export function deleteActivity(id: number): void {
+  const stmt = getDb().prepare('DELETE FROM activities WHERE id = ?');
+  stmt.run(id);
 }
 
 // Settings operations
-export async function getSetting(
-  db: D1Database,
-  key: string
-): Promise<string | null> {
-  const result = await db
-    .prepare('SELECT value FROM settings WHERE key = ?')
-    .bind(key)
-    .first<{ value: string }>();
-
+export function getSetting(key: string): string | null {
+  const stmt = getDb().prepare('SELECT value FROM settings WHERE key = ?');
+  const result = stmt.get(key) as { value: string } | undefined;
   return result?.value ?? null;
 }
 
-export async function setSetting(
-  db: D1Database,
-  key: string,
-  value: string
-): Promise<void> {
-  await db
-    .prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)')
-    .bind(key, value)
-    .run();
+export function setSetting(key: string, value: string): void {
+  const stmt = getDb().prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+  stmt.run(key, value);
 }
 
-export async function getAllSettings(db: D1Database): Promise<Setting[]> {
-  const { results } = await db.prepare('SELECT * FROM settings').all<Setting>();
-  return results;
+export function getAllSettings(): Setting[] {
+  const stmt = getDb().prepare('SELECT * FROM settings');
+  return stmt.all() as Setting[];
 }
 
 // Announcement operations
-export async function getActiveAnnouncements(
-  db: D1Database
-): Promise<Announcement[]> {
-  const { results } = await db
-    .prepare('SELECT * FROM announcements WHERE active = 1 ORDER BY created_at DESC')
-    .all<Announcement>();
-
-  return results;
+export function getActiveAnnouncements(): Announcement[] {
+  const stmt = getDb().prepare('SELECT * FROM announcements WHERE active = 1 ORDER BY created_at DESC');
+  return stmt.all() as Announcement[];
 }
 
-export async function insertAnnouncement(
-  db: D1Database,
-  message: string
-): Promise<number> {
-  const result = await db
-    .prepare('INSERT INTO announcements (message) VALUES (?)')
-    .bind(message)
-    .run();
-
-  return result.meta.last_row_id;
+export function insertAnnouncement(message: string): number {
+  const stmt = getDb().prepare('INSERT INTO announcements (message) VALUES (?)');
+  const result = stmt.run(message);
+  return result.lastInsertRowid as number;
 }
 
-export async function getAllAnnouncements(
-  db: D1Database
-): Promise<Announcement[]> {
-  const { results } = await db
-    .prepare('SELECT * FROM announcements ORDER BY created_at DESC')
-    .all<Announcement>();
-
-  return results;
+export function getAllAnnouncements(): Announcement[] {
+  const stmt = getDb().prepare('SELECT * FROM announcements ORDER BY created_at DESC');
+  return stmt.all() as Announcement[];
 }
 
-export async function getAnnouncementById(
-  db: D1Database,
-  id: number
-): Promise<Announcement | null> {
-  const result = await db
-    .prepare('SELECT * FROM announcements WHERE id = ?')
-    .bind(id)
-    .first<Announcement>();
-
-  return result;
+export function getAnnouncementById(id: number): Announcement | undefined {
+  const stmt = getDb().prepare('SELECT * FROM announcements WHERE id = ?');
+  return stmt.get(id) as Announcement | undefined;
 }
 
-export async function updateAnnouncement(
-  db: D1Database,
-  id: number,
-  message: string
-): Promise<void> {
-  await db
-    .prepare('UPDATE announcements SET message = ? WHERE id = ?')
-    .bind(message, id)
-    .run();
+export function updateAnnouncement(id: number, message: string): void {
+  const stmt = getDb().prepare('UPDATE announcements SET message = ? WHERE id = ?');
+  stmt.run(message, id);
 }
 
-export async function toggleAnnouncementActive(
-  db: D1Database,
-  id: number,
-  active: boolean
-): Promise<void> {
-  await db
-    .prepare('UPDATE announcements SET active = ? WHERE id = ?')
-    .bind(active ? 1 : 0, id)
-    .run();
+export function toggleAnnouncementActive(id: number, active: boolean): void {
+  const stmt = getDb().prepare('UPDATE announcements SET active = ? WHERE id = ?');
+  stmt.run(active ? 1 : 0, id);
 }
 
-export async function deleteAnnouncement(
-  db: D1Database,
-  id: number
-): Promise<void> {
-  await db.prepare('DELETE FROM announcements WHERE id = ?').bind(id).run();
+export function deleteAnnouncement(id: number): void {
+  const stmt = getDb().prepare('DELETE FROM announcements WHERE id = ?');
+  stmt.run(id);
 }
 
 // Specialized activity queries
-export async function getScheduledActivities(
-  db: D1Database
-): Promise<Activity[]> {
-  const { results } = await db
-    .prepare(
-      `
+export function getScheduledActivities(): Activity[] {
+  const stmt = getDb().prepare(`
     SELECT * FROM activities
     WHERE status = 'scheduled'
     ORDER BY scheduled_start ASC
-  `
-    )
-    .all<Activity>();
-
-  return results;
+  `);
+  return stmt.all() as Activity[];
 }
 
-export async function getApprovedAndScheduledActivities(
-  db: D1Database
-): Promise<Activity[]> {
-  const { results } = await db
-    .prepare(
-      `
+export function getApprovedAndScheduledActivities(): Activity[] {
+  const stmt = getDb().prepare(`
     SELECT * FROM activities
     WHERE status IN ('approved', 'scheduled')
     ORDER BY title ASC
-  `
-    )
-    .all<Activity>();
-
-  return results;
+  `);
+  return stmt.all() as Activity[];
 }
 
 // Rate limiting operations for admin login
@@ -376,19 +285,12 @@ const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
 /**
  * Check if an IP address is currently locked out due to too many failed login attempts
  */
-export async function isIpLocked(
-  db: D1Database,
-  ipAddress: string
-): Promise<boolean> {
-  const result = await db
-    .prepare(
-      `
+export function isIpLocked(ipAddress: string): boolean {
+  const stmt = getDb().prepare(`
     SELECT locked_until FROM login_attempts
     WHERE ip_address = ? AND locked_until IS NOT NULL
-  `
-    )
-    .bind(ipAddress)
-    .first<{ locked_until: string }>();
+  `);
+  const result = stmt.get(ipAddress) as { locked_until: string } | undefined;
 
   if (!result) {
     return false;
@@ -403,7 +305,7 @@ export async function isIpLocked(
   }
 
   // Lock expired, clear it
-  await clearLoginAttempts(db, ipAddress);
+  clearLoginAttempts(ipAddress);
   return false;
 }
 
@@ -411,15 +313,10 @@ export async function isIpLocked(
  * Record a failed login attempt for an IP address
  * Returns true if the IP should now be locked out
  */
-export async function recordFailedLogin(
-  db: D1Database,
-  ipAddress: string
-): Promise<boolean> {
+export function recordFailedLogin(ipAddress: string): boolean {
   // Get current attempt record
-  const result = await db
-    .prepare('SELECT attempts FROM login_attempts WHERE ip_address = ?')
-    .bind(ipAddress)
-    .first<{ attempts: number }>();
+  const selectStmt = getDb().prepare('SELECT attempts FROM login_attempts WHERE ip_address = ?');
+  const result = selectStmt.get(ipAddress) as { attempts: number } | undefined;
 
   const currentAttempts = result ? result.attempts : 0;
   const newAttempts = currentAttempts + 1;
@@ -427,27 +324,19 @@ export async function recordFailedLogin(
   if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
     // Lock the IP
     const lockedUntil = new Date(Date.now() + LOCKOUT_DURATION).toISOString();
-    await db
-      .prepare(
-        `
+    const stmt = getDb().prepare(`
       INSERT OR REPLACE INTO login_attempts (ip_address, attempts, last_attempt, locked_until)
       VALUES (?, ?, CURRENT_TIMESTAMP, ?)
-    `
-      )
-      .bind(ipAddress, newAttempts, lockedUntil)
-      .run();
+    `);
+    stmt.run(ipAddress, newAttempts, lockedUntil);
     return true;
   } else {
     // Increment attempts
-    await db
-      .prepare(
-        `
+    const stmt = getDb().prepare(`
       INSERT OR REPLACE INTO login_attempts (ip_address, attempts, last_attempt, locked_until)
       VALUES (?, ?, CURRENT_TIMESTAMP, NULL)
-    `
-      )
-      .bind(ipAddress, newAttempts)
-      .run();
+    `);
+    stmt.run(ipAddress, newAttempts);
     return false;
   }
 }
@@ -455,27 +344,17 @@ export async function recordFailedLogin(
 /**
  * Clear login attempts for an IP address (called on successful login)
  */
-export async function clearLoginAttempts(
-  db: D1Database,
-  ipAddress: string
-): Promise<void> {
-  await db
-    .prepare('DELETE FROM login_attempts WHERE ip_address = ?')
-    .bind(ipAddress)
-    .run();
+export function clearLoginAttempts(ipAddress: string): void {
+  const stmt = getDb().prepare('DELETE FROM login_attempts WHERE ip_address = ?');
+  stmt.run(ipAddress);
 }
 
 /**
  * Get remaining attempts before lockout
  */
-export async function getRemainingAttempts(
-  db: D1Database,
-  ipAddress: string
-): Promise<number> {
-  const result = await db
-    .prepare('SELECT attempts FROM login_attempts WHERE ip_address = ?')
-    .bind(ipAddress)
-    .first<{ attempts: number }>();
+export function getRemainingAttempts(ipAddress: string): number {
+  const stmt = getDb().prepare('SELECT attempts FROM login_attempts WHERE ip_address = ?');
+  const result = stmt.get(ipAddress) as { attempts: number } | undefined;
 
   if (!result) {
     return MAX_LOGIN_ATTEMPTS;

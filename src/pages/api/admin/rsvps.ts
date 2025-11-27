@@ -5,9 +5,8 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ locals }) => {
   try {
-    const db = locals.runtime.env.DB;
     // Get all attendees ordered by created_at DESC
-    const attendees = await getAllAttendees(db);
+    const attendees = getAllAttendees();
 
     return new Response(
       JSON.stringify({

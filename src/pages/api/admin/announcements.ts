@@ -5,7 +5,6 @@ export const prerender = false;
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    const db = locals.runtime.env.DB;
     const body = await request.json();
     const { message } = body;
 
@@ -43,7 +42,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    const id = await insertAnnouncement(db, message.trim());
+    const id = insertAnnouncement(message.trim());
 
     return new Response(
       JSON.stringify({

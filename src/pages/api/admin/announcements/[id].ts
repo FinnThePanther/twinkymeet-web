@@ -5,7 +5,6 @@ export const prerender = false;
 
 export const DELETE: APIRoute = async ({ params, locals }) => {
   try {
-    const db = locals.runtime.env.DB;
     const id = parseInt(params.id || '0', 10);
 
     if (isNaN(id) || id <= 0) {
@@ -23,7 +22,7 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
       );
     }
 
-    const existingAnnouncement = await getAnnouncementById(db, id);
+    const existingAnnouncement = getAnnouncementById(id);
 
     if (!existingAnnouncement) {
       return new Response(
@@ -40,7 +39,7 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
       );
     }
 
-    await deleteAnnouncement(db, id);
+    deleteAnnouncement(id);
 
     return new Response(
       JSON.stringify({

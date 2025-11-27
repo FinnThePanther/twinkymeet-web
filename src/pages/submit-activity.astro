@@ -2,11 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getSetting } from '../lib/db';
 
-// Get database instance
-const db = Astro.locals.runtime.env.DB;
-
 // Check if activity submissions are open
-const submissionsOpen = (await getSetting(db, 'activity_submissions_open')) === 'true';
+const submissionsOpen = getSetting('activity_submissions_open') === 'true';
 ---
 
 <BaseLayout

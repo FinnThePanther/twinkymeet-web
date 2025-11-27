@@ -9,7 +9,6 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ params, locals }) => {
   try {
-    const db = locals.runtime.env.DB;
     const id = parseInt(params.id || '0', 10);
 
     if (isNaN(id) || id <= 0) {
@@ -25,7 +24,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
       );
     }
 
-    const attendee = await getAttendeeById(db, id);
+    const attendee = getAttendeeById(id);
 
     if (!attendee) {
       return new Response(
@@ -67,7 +66,6 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
 export const PUT: APIRoute = async ({ params, request, locals }) => {
   try {
-    const db = locals.runtime.env.DB;
     const id = parseInt(params.id || '0', 10);
 
     if (isNaN(id) || id <= 0) {
@@ -84,7 +82,7 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
     }
 
     // Check if attendee exists
-    const existingAttendee = await getAttendeeById(db, id);
+    const existingAttendee = getAttendeeById(id);
     if (!existingAttendee) {
       return new Response(
         JSON.stringify({
@@ -188,10 +186,10 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
     if (payment_status !== undefined) updates.payment_status = payment_status;
 
     // Update attendee
-    await updateAttendee(db, id, updates);
+    updateAttendee(id, updates);
 
     // Get updated attendee
-    const updatedAttendee = await getAttendeeById(db, id);
+    const updatedAttendee = getAttendeeById(id);
 
     return new Response(
       JSON.stringify({
@@ -221,7 +219,6 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
 
 export const DELETE: APIRoute = async ({ params, locals }) => {
   try {
-    const db = locals.runtime.env.DB;
     const id = parseInt(params.id || '0', 10);
 
     if (isNaN(id) || id <= 0) {
@@ -238,7 +235,7 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
     }
 
     // Check if attendee exists
-    const existingAttendee = await getAttendeeById(db, id);
+    const existingAttendee = getAttendeeById(id);
     if (!existingAttendee) {
       return new Response(
         JSON.stringify({
@@ -253,7 +250,7 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
     }
 
     // Delete attendee
-    await deleteAttendee(db, id);
+    deleteAttendee(id);
 
     return new Response(
       JSON.stringify({

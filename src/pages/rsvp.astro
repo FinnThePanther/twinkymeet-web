@@ -2,11 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getSetting } from '../lib/db';
 
-// Get database instance
-const db = Astro.locals.runtime.env.DB;
-
 // Check if RSVPs are open
-const rsvpOpen = (await getSetting(db, 'rsvp_open')) === 'true';
+const rsvpOpen = getSetting('rsvp_open') === 'true';
 ---
 
 <BaseLayout
