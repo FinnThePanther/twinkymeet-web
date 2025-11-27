@@ -50,7 +50,7 @@ const lastYear = '2025';
     />
 
     <!-- What is TwinkyMeet - Full width section with background slideshow -->
-    <section class="relative mb-16 overflow-hidden py-16">
+    <section class="relative overflow-hidden py-16">
       <!-- Background Slideshow -->
       {
         allImages.length > 0 && (
@@ -155,10 +155,49 @@ const lastYear = '2025';
         .intro-slide.active {
           opacity: 1;
         }
+
+        .soft-grid {
+          background-image:
+            radial-gradient(circle at 1px 1px, rgba(8, 145, 178, 0.1) 1px, transparent 0),
+            linear-gradient(120deg, rgba(255, 237, 213, 0.45), rgba(255, 255, 255, 0.25));
+          background-size: 28px 28px, 100% 100%;
+        }
+
+        .decorative-blob {
+          position: absolute;
+          border-radius: 9999px;
+          filter: blur(90px);
+          opacity: 0.55;
+        }
+
+        .decorative-blob--primary {
+          background: radial-gradient(circle, rgba(8, 145, 178, 0.35), rgba(8, 145, 178, 0));
+          width: 25rem;
+          height: 25rem;
+          top: -5rem;
+          left: -6rem;
+        }
+
+        .decorative-blob--accent {
+          background: radial-gradient(circle, rgba(249, 115, 22, 0.35), rgba(249, 115, 22, 0));
+          width: 20rem;
+          height: 20rem;
+          bottom: 2rem;
+          right: -4rem;
+        }
       </style>
     </section>
 
-    <div class="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+    <section class="relative -mt-12 overflow-hidden pt-20 pb-12 sm:pt-24">
+      <div
+        aria-hidden="true"
+        class="pointer-events-none absolute inset-x-0 bottom-0 -top-16"
+      >
+        <div class="soft-grid absolute inset-0"></div>
+        <div class="decorative-blob decorative-blob--primary"></div>
+        <div class="decorative-blob decorative-blob--accent"></div>
+      </div>
+      <div class="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
       <!-- Event Details -->
       <section
         class="bg-primary-50 border-primary-600 mb-16 rounded-lg border-l-4 p-6"
@@ -663,6 +702,7 @@ const lastYear = '2025';
           </section>
         )
       } -->
-    </div>
+      </div>
+    </section>
   </div>
 </BaseLayout>
