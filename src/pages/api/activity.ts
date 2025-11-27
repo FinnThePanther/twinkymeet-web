@@ -20,10 +20,12 @@ const VALID_TIME_PREFERENCES = [
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
+    const db = locals.runtime.env.DB;
+
     // Check if activity submissions are open
-    const submissionsOpen = getSetting('activity_submissions_open');
+    const submissionsOpen = await getSetting(db, 'activity_submissions_open');
     if (submissionsOpen !== 'true') {
       return new Response(
         JSON.stringify({
@@ -140,7 +142,7 @@ export const POST: APIRoute = async ({ request }) => {
     const trimmedDescription = description.trim();
 
     // Insert activity into database with status = 'pending'
-    const activityId = insertActivity({
+    const activityId = await insertActivity(db, {
       title: trimmedTitle,
       host_name: trimmedHostName,
       host_email: trimmedHostEmail,

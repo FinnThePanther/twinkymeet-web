@@ -1,7 +1,6 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import {
-  getDb,
   getAllAttendees,
   getAllActivities,
   getActiveAnnouncements,
@@ -10,40 +9,43 @@ import { verifySessionToken } from '../../lib/auth';
 
 // Authentication check - redirect if not authenticated
 const sessionCookie = Astro.cookies.get('session')?.value;
-const sessionSecret = import.meta.env.SESSION_SECRET || '';
+const sessionSecret = (Astro.locals.runtime?.env?.SESSION_SECRET as string) || '';
 const isAuthenticated =
-  sessionCookie && verifySessionToken(sessionCookie, sessionSecret);
+  sessionCookie && sessionSecret && verifySessionToken(sessionCookie, sessionSecret);
 
 if (!isAuthenticated) {
   return Astro.redirect('/admin/login');
 }
 
 // Get statistics
-const db = getDb();
+const db = Astro.locals.runtime.env.DB;
 
 // Count RSVPs
-const rsvpResult = db
+const rsvpResult = (await db
   .prepare('SELECT COUNT(*) as count FROM attendees')
-  .get() as { count: number };
+  .first()) as { count: number };
 const rsvpCount = rsvpResult.count;
 
 // Count activities by status
-const pendingResult = db
+const pendingResult = (await db
   .prepare('SELECT COUNT(*) as count FROM activities WHERE status = ?')
-  .get('pending') as { count: number };
-const approvedResult = db
+  .bind('pending')
+  .first()) as { count: number };
+const approvedResult = (await db
   .prepare('SELECT COUNT(*) as count FROM activities WHERE status = ?')
-  .get('approved') as { count: number };
-const scheduledResult = db
+  .bind('approved')
+  .first()) as { count: number };
+const scheduledResult = (await db
   .prepare('SELECT COUNT(*) as count FROM activities WHERE status = ?')
-  .get('scheduled') as { count: number };
+  .bind('scheduled')
+  .first()) as { count: number };
 
 const pendingCount = pendingResult.count;
 const approvedCount = approvedResult.count;
 const scheduledCount = scheduledResult.count;
 
 // Get recent RSVPs
-const recentRsvps = db
+const recentRsvpsResult = await db
   .prepare(
     `
   SELECT name, email, created_at
@@ -52,10 +54,15 @@ const recentRsvps = db
   LIMIT 5
 `
   )
-  .all() as Array<{ name: string; email: string; created_at: string }>;
+  .all();
+const recentRsvps = recentRsvpsResult.results as Array<{
+  name: string;
+  email: string;
+  created_at: string;
+}>;
 
 // Get active announcements
-const announcements = getActiveAnnouncements();
+const announcements = await getActiveAnnouncements(db);
 
 // Format date helper
 function formatDate(dateStr: string): string {

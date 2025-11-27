@@ -3,10 +3,12 @@ import { insertAttendee, getAttendeeByEmail, getSetting } from '../../lib/db';
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
+    const db = locals.runtime.env.DB;
+
     // Check if RSVPs are open
-    const rsvpOpen = getSetting('rsvp_open');
+    const rsvpOpen = await getSetting(db, 'rsvp_open');
     if (rsvpOpen !== 'true') {
       return new Response(
         JSON.stringify({
@@ -63,7 +65,7 @@ export const POST: APIRoute = async ({ request }) => {
     const trimmedName = name.trim();
 
     // Check for duplicate email
-    const existingAttendee = getAttendeeByEmail(trimmedEmail);
+    const existingAttendee = await getAttendeeByEmail(db, trimmedEmail);
     if (existingAttendee) {
       return new Response(
         JSON.stringify({
@@ -97,7 +99,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Insert attendee into database
-    const attendeeId = insertAttendee({
+    const attendeeId = await insertAttendee(db, {
       name: trimmedName,
       email: trimmedEmail,
       dietary_restrictions: dietary_restrictions?.trim() || undefined,

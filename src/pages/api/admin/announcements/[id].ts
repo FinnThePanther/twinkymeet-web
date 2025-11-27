@@ -3,8 +3,9 @@ import { getAnnouncementById, deleteAnnouncement } from '../../../../lib/db';
 
 export const prerender = false;
 
-export const DELETE: APIRoute = async ({ params }) => {
+export const DELETE: APIRoute = async ({ params, locals }) => {
   try {
+    const db = locals.runtime.env.DB;
     const id = parseInt(params.id || '0', 10);
 
     if (isNaN(id) || id <= 0) {
@@ -22,7 +23,7 @@ export const DELETE: APIRoute = async ({ params }) => {
       );
     }
 
-    const existingAnnouncement = getAnnouncementById(id);
+    const existingAnnouncement = await getAnnouncementById(db, id);
 
     if (!existingAnnouncement) {
       return new Response(
@@ -39,7 +40,7 @@ export const DELETE: APIRoute = async ({ params }) => {
       );
     }
 
-    deleteAnnouncement(id);
+    await deleteAnnouncement(db, id);
 
     return new Response(
       JSON.stringify({

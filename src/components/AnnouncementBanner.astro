@@ -1,8 +1,11 @@
 ---
 import { getActiveAnnouncements } from '../lib/db';
 
+// Get database instance
+const db = Astro.locals.runtime.env.DB;
+
 // Fetch active announcements
-const announcements = getActiveAnnouncements();
+const announcements = await getActiveAnnouncements(db);
 ---
 
 {

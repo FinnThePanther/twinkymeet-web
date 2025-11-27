@@ -4,9 +4,9 @@ import '../../styles/global.css';
 
 // Check if already logged in
 const sessionCookie = Astro.cookies.get('session')?.value;
-const sessionSecret = import.meta.env.SESSION_SECRET || '';
+const sessionSecret = (Astro.locals.runtime?.env?.SESSION_SECRET as string) || '';
 const isAuthenticated =
-  sessionCookie && verifySessionToken(sessionCookie, sessionSecret);
+  sessionCookie && sessionSecret && verifySessionToken(sessionCookie, sessionSecret);
 
 // If already authenticated, redirect to admin dashboard
 if (isAuthenticated) {

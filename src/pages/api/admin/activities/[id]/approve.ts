@@ -3,8 +3,9 @@ import { getActivityById, updateActivity } from '../../../../../lib/db';
 
 export const prerender = false;
 
-export const PATCH: APIRoute = async ({ params }) => {
+export const PATCH: APIRoute = async ({ params, locals }) => {
   try {
+    const db = locals.runtime.env.DB;
     const id = parseInt(params.id || '0', 10);
 
     if (isNaN(id) || id <= 0) {
@@ -22,7 +23,7 @@ export const PATCH: APIRoute = async ({ params }) => {
       );
     }
 
-    const existingActivity = getActivityById(id);
+    const existingActivity = await getActivityById(db, id);
 
     if (!existingActivity) {
       return new Response(
@@ -40,9 +41,9 @@ export const PATCH: APIRoute = async ({ params }) => {
     }
 
     // Update status to 'approved'
-    updateActivity(id, { status: 'approved' });
+    await updateActivity(db, id, { status: 'approved' });
 
-    const updatedActivity = getActivityById(id);
+    const updatedActivity = await getActivityById(db, id);
 
     return new Response(
       JSON.stringify({

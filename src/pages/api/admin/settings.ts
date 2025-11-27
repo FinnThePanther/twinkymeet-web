@@ -3,9 +3,10 @@ import { getAllSettings, setSetting } from '../../../lib/db';
 
 export const prerender = false;
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ locals }) => {
   try {
-    const settings = getAllSettings();
+    const db = locals.runtime.env.DB;
+    const settings = await getAllSettings(db);
 
     // Convert array of settings to object for easier access
     const settingsObj: Record<string, string> = {};
@@ -42,8 +43,9 @@ export const GET: APIRoute = async () => {
   }
 };
 
-export const PUT: APIRoute = async ({ request }) => {
+export const PUT: APIRoute = async ({ request, locals }) => {
   try {
+    const db = locals.runtime.env.DB;
     const body = await request.json();
     const {
       event_date_start,
@@ -143,21 +145,21 @@ export const PUT: APIRoute = async ({ request }) => {
 
     // Update settings
     if (event_date_start !== undefined) {
-      setSetting('event_date_start', event_date_start);
+      await setSetting(db, 'event_date_start', event_date_start);
     }
 
     if (event_date_end !== undefined) {
-      setSetting('event_date_end', event_date_end);
+      await setSetting(db, 'event_date_end', event_date_end);
     }
 
     if (location !== undefined) {
-      setSetting('location', location.trim());
+      await setSetting(db, 'location', location.trim());
     }
 
     if (rsvp_open !== undefined) {
       const value =
         typeof rsvp_open === 'boolean' ? rsvp_open.toString() : rsvp_open;
-      setSetting('rsvp_open', value);
+      await setSetting(db, 'rsvp_open', value);
     }
 
     if (activity_submissions_open !== undefined) {
@@ -165,11 +167,11 @@ export const PUT: APIRoute = async ({ request }) => {
         typeof activity_submissions_open === 'boolean'
           ? activity_submissions_open.toString()
           : activity_submissions_open;
-      setSetting('activity_submissions_open', value);
+      await setSetting(db, 'activity_submissions_open', value);
     }
 
     // Fetch updated settings
-    const settings = getAllSettings();
+    const settings = await getAllSettings(db);
     const settingsObj: Record<string, string> = {};
     settings.forEach((setting) => {
       settingsObj[setting.key] = setting.value;

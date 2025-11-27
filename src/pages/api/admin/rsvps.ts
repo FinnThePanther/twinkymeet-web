@@ -3,10 +3,11 @@ import { getAllAttendees } from '../../../lib/db';
 
 export const prerender = false;
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ locals }) => {
   try {
+    const db = locals.runtime.env.DB;
     // Get all attendees ordered by created_at DESC
-    const attendees = getAllAttendees();
+    const attendees = await getAllAttendees(db);
 
     return new Response(
       JSON.stringify({

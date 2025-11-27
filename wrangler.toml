@@ -1,0 +1,17 @@
+name = "twinkymeet-web"
+compatibility_date = "2024-11-26"
+
+# Development database
+[[d1_databases]]
+binding = "DB"
+database_name = "twinkymeet-db"
+database_id = "92f3968a-8cdb-4cf5-9b8e-9e9554f29dcb"
+
+# Production database
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "twinkymeet-prod"
+database_id = "5d046a1b-5085-446d-92bf-efa0908d8c36"
+
+[vars]
+NODE_ENV = "production"

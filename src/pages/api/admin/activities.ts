@@ -3,16 +3,18 @@ import { getAllActivities } from '../../../lib/db';
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ url }) => {
+export const GET: APIRoute = async ({ url, locals }) => {
   try {
+    const db = locals.runtime.env.DB;
     // Optional status filter via query param
     const status = url.searchParams.get('status');
 
     const activities = status
-      ? getAllActivities(
+      ? await getAllActivities(
+          db,
           status as 'pending' | 'approved' | 'scheduled' | 'cancelled'
         )
-      : getAllActivities();
+      : await getAllActivities(db);
 
     return new Response(
       JSON.stringify({

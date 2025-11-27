@@ -3,8 +3,9 @@ import { getActivityById, updateActivity } from '../../../../../lib/db';
 
 export const prerender = false;
 
-export const PATCH: APIRoute = async ({ params, request }) => {
+export const PATCH: APIRoute = async ({ params, request, locals }) => {
   try {
+    const db = locals.runtime.env.DB;
     const id = parseInt(params.id || '0', 10);
 
     if (isNaN(id) || id <= 0) {
@@ -22,7 +23,7 @@ export const PATCH: APIRoute = async ({ params, request }) => {
       );
     }
 
-    const existingActivity = getActivityById(id);
+    const existingActivity = await getActivityById(db, id);
 
     if (!existingActivity) {
       return new Response(
@@ -98,14 +99,14 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     }
 
     // Update activity with schedule information and set status to 'scheduled'
-    updateActivity(id, {
+    await updateActivity(db, id, {
       scheduled_start,
       scheduled_end,
       location: location.trim(),
       status: 'scheduled',
     });
 
-    const updatedActivity = getActivityById(id);
+    const updatedActivity = await getActivityById(db, id);
 
     return new Response(
       JSON.stringify({

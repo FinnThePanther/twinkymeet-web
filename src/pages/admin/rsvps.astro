@@ -5,16 +5,17 @@ import { verifySessionToken } from '../../lib/auth';
 
 // Authentication check - redirect if not authenticated
 const sessionCookie = Astro.cookies.get('session')?.value;
-const sessionSecret = import.meta.env.SESSION_SECRET || '';
+const sessionSecret = (Astro.locals.runtime?.env?.SESSION_SECRET as string) || '';
 const isAuthenticated =
-  sessionCookie && verifySessionToken(sessionCookie, sessionSecret);
+  sessionCookie && sessionSecret && verifySessionToken(sessionCookie, sessionSecret);
 
 if (!isAuthenticated) {
   return Astro.redirect('/admin/login');
 }
 
 // Get all attendees
-const attendees = getAllAttendees();
+const db = Astro.locals.runtime.env.DB;
+const attendees = await getAllAttendees(db);
 
 // Format date helper
 function formatDate(dateStr: string): string {

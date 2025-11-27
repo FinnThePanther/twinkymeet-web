@@ -7,23 +7,24 @@ export const prerender = false;
 
 // Check authentication
 const sessionCookie = Astro.cookies.get('session')?.value;
-const sessionSecret = import.meta.env.SESSION_SECRET || '';
+const sessionSecret = (Astro.locals.runtime?.env?.SESSION_SECRET as string) || '';
 const isAuthenticated =
-  sessionCookie && verifySessionToken(sessionCookie, sessionSecret);
+  sessionCookie && sessionSecret && verifySessionToken(sessionCookie, sessionSecret);
 
 if (!isAuthenticated) {
   return Astro.redirect('/admin/login');
 }
 
 // Fetch current settings
-const settingsArray = getAllSettings();
+const db = Astro.locals.runtime.env.DB;
+const settingsArray = await getAllSettings(db);
 const settings: Record<string, string> = {};
 settingsArray.forEach((s) => {
   settings[s.key] = s.value;
 });
 
 // Fetch all announcements
-const announcements = getAllAnnouncements();
+const announcements = await getAllAnnouncements(db);
 ---
 
 <AdminLayout title="Site Settings">

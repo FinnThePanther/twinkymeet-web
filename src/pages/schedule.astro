@@ -5,7 +5,8 @@ import ScheduleItem from '../components/ScheduleItem.astro';
 import { getScheduledActivities } from '../lib/db';
 
 // Fetch all scheduled activities
-const activities = getScheduledActivities();
+const db = Astro.locals.runtime.env.DB;
+const activities = await getScheduledActivities(db);
 
 // Group activities by day
 const groupedByDay: Record<string, typeof activities> = {};

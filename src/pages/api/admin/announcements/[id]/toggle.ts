@@ -6,8 +6,9 @@ import {
 
 export const prerender = false;
 
-export const PATCH: APIRoute = async ({ params, request }) => {
+export const PATCH: APIRoute = async ({ params, request, locals }) => {
   try {
+    const db = locals.runtime.env.DB;
     const id = parseInt(params.id || '0', 10);
 
     if (isNaN(id) || id <= 0) {
@@ -25,7 +26,7 @@ export const PATCH: APIRoute = async ({ params, request }) => {
       );
     }
 
-    const existingAnnouncement = getAnnouncementById(id);
+    const existingAnnouncement = await getAnnouncementById(db, id);
 
     if (!existingAnnouncement) {
       return new Response(
@@ -60,7 +61,7 @@ export const PATCH: APIRoute = async ({ params, request }) => {
       );
     }
 
-    toggleAnnouncementActive(id, active);
+    await toggleAnnouncementActive(db, id, active);
 
     return new Response(
       JSON.stringify({

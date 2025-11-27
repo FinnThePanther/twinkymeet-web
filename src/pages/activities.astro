@@ -5,7 +5,8 @@ import ActivityCard from '../components/ActivityCard.astro';
 import { getApprovedAndScheduledActivities } from '../lib/db';
 
 // Fetch all approved and scheduled activities
-const activities = getApprovedAndScheduledActivities();
+const db = Astro.locals.runtime.env.DB;
+const activities = await getApprovedAndScheduledActivities(db);
 
 // Get unique activity types for filter buttons and count activities per type
 const activityTypes = [

@@ -19,7 +19,8 @@ const {
 
 // Get event date for countdown
 import { getSetting } from '../lib/db';
-const eventDateStart = getSetting('event_date_start') || '2026-07-01';
+const db = Astro.locals.runtime.env.DB;
+const eventDateStart = (await getSetting(db, 'event_date_start')) || '2026-07-01';
 ---
 
 <section class="relative overflow-hidden">

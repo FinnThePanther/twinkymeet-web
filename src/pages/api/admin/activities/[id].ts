@@ -7,8 +7,9 @@ import {
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async ({ params, locals }) => {
   try {
+    const db = locals.runtime.env.DB;
     const id = parseInt(params.id || '0', 10);
 
     if (isNaN(id) || id <= 0) {
@@ -26,7 +27,7 @@ export const GET: APIRoute = async ({ params }) => {
       );
     }
 
-    const activity = getActivityById(id);
+    const activity = await getActivityById(db, id);
 
     if (!activity) {
       return new Response(
@@ -72,8 +73,9 @@ export const GET: APIRoute = async ({ params }) => {
   }
 };
 
-export const PUT: APIRoute = async ({ params, request }) => {
+export const PUT: APIRoute = async ({ params, request, locals }) => {
   try {
+    const db = locals.runtime.env.DB;
     const id = parseInt(params.id || '0', 10);
 
     if (isNaN(id) || id <= 0) {
@@ -91,7 +93,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
       );
     }
 
-    const existingActivity = getActivityById(id);
+    const existingActivity = await getActivityById(db, id);
 
     if (!existingActivity) {
       return new Response(
@@ -304,9 +306,9 @@ export const PUT: APIRoute = async ({ params, request }) => {
     if (location !== undefined)
       updates.location = location ? location.trim() : null;
 
-    updateActivity(id, updates);
+    await updateActivity(db, id, updates);
 
-    const updatedActivity = getActivityById(id);
+    const updatedActivity = await getActivityById(db, id);
 
     return new Response(
       JSON.stringify({
@@ -337,8 +339,9 @@ export const PUT: APIRoute = async ({ params, request }) => {
   }
 };
 
-export const DELETE: APIRoute = async ({ params }) => {
+export const DELETE: APIRoute = async ({ params, locals }) => {
   try {
+    const db = locals.runtime.env.DB;
     const id = parseInt(params.id || '0', 10);
 
     if (isNaN(id) || id <= 0) {
@@ -356,7 +359,7 @@ export const DELETE: APIRoute = async ({ params }) => {
       );
     }
 
-    const existingActivity = getActivityById(id);
+    const existingActivity = await getActivityById(db, id);
 
     if (!existingActivity) {
       return new Response(
@@ -373,7 +376,7 @@ export const DELETE: APIRoute = async ({ params }) => {
       );
     }
 
-    deleteActivity(id);
+    await deleteActivity(db, id);
 
     return new Response(
       JSON.stringify({
