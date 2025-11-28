@@ -53,50 +53,42 @@ const currentPath = Astro.url.pathname;
       rel="stylesheet"
     />
 
-    <!-- Preload critical hero images based on current page -->
-    {
-      currentPath === '/' && homeHeroImage && (
-        <link
-          rel="preload"
-          as="image"
-          href={homeHeroImage.default.src}
-          fetchpriority="high"
-        />
-      )
-    }
+    <!-- Preload current page's hero image for faster rendering -->
+    {currentPath === '/' && homeHeroImage && (
+      <link
+        rel="preload"
+        as="image"
+        href={homeHeroImage.default.src}
+        fetchpriority="high"
+      />
+    )}
 
-    {
-      currentPath === '/about' && aboutHeroImage && (
-        <link
-          rel="preload"
-          as="image"
-          href={aboutHeroImage.default.src}
-          fetchpriority="high"
-        />
-      )
-    }
+    {currentPath === '/about' && aboutHeroImage && (
+      <link
+        rel="preload"
+        as="image"
+        href={aboutHeroImage.default.src}
+        fetchpriority="high"
+      />
+    )}
 
-    {
-      currentPath === '/schedule' && scheduleHeroImage && (
-        <link
-          rel="preload"
-          as="image"
-          href={scheduleHeroImage.default.src}
-          fetchpriority="high"
-        />
-      )
-    }
+    {currentPath === '/schedule' && scheduleHeroImage && (
+      <link
+        rel="preload"
+        as="image"
+        href={scheduleHeroImage.default.src}
+        fetchpriority="high"
+      />
+    )}
 
-    {
-      currentPath === '/activities' && activitiesHeroImage && (
-        <link
-          rel="preload"
-          as="image"
-          href={activitiesHeroImage.default.src}
-          fetchpriority="high"
-        />
-      )
-    }
+    {currentPath === '/activities' && activitiesHeroImage && (
+      <link
+        rel="preload"
+        as="image"
+        href={activitiesHeroImage.default.src}
+        fetchpriority="high"
+      />
+    )}
 
     <title>{title}</title>
   </head>

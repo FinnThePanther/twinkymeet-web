@@ -29,6 +29,40 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
-  // Continue to the next middleware or route handler
-  return next();
+  // Get response from next handler
+  const response = await next();
+
+  // Add cache headers for images and static assets
+  const pathname = url.pathname;
+
+  // Cache images for 1 year (immutable since they're hashed)
+  if (
+    pathname.match(/\.(jpg|jpeg|png|webp|avif|svg|gif|ico)$/i) ||
+    pathname.includes('/_image/')
+  ) {
+    response.headers.set(
+      'Cache-Control',
+      'public, max-age=31536000, immutable'
+    );
+  }
+
+  // Cache fonts for 1 year
+  if (pathname.match(/\.(woff|woff2|ttf|eot)$/i)) {
+    response.headers.set(
+      'Cache-Control',
+      'public, max-age=31536000, immutable'
+    );
+  }
+
+  // Cache CSS/JS for 1 day (they may be rebuilt)
+  if (pathname.match(/\.(css|js)$/i)) {
+    response.headers.set('Cache-Control', 'public, max-age=86400');
+  }
+
+  // Cache HTML pages for 5 minutes (allows revalidation without breaking)
+  if (pathname.match(/\.(html)?$/i) || pathname === '/') {
+    response.headers.set('Cache-Control', 'public, max-age=300');
+  }
+
+  return response;
 });
