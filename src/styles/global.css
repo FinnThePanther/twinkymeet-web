@@ -29,6 +29,15 @@
   /* Custom shadows for convention-style cards */
   --shadow-card: 6px 6px 0px rgba(0, 0, 0, 0.1);
   --shadow-card-hover: 8px 8px 0px rgba(0, 0, 0, 0.15);
+
+  /* Custom Fonts */
+  --font-family-heading: Fredoka, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-family-sans: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Base typography styles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-heading);
 }
 
 /* Custom utilities */
