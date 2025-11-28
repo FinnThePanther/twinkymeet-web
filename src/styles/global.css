@@ -32,12 +32,16 @@
 
   /* Custom Fonts */
   --font-family-heading: Fredoka, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  --font-family-sans: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-family-sans: Nunito, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 /* Base typography styles */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-family-heading);
+}
+
+body {
+  font-family: var(--font-family-sans);
 }
 
 /* Custom utilities */
