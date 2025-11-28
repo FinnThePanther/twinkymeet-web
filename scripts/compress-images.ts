@@ -3,8 +3,8 @@ import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 
 const imagesDir = join(process.cwd(), 'src/images');
-const targetQuality = 85; // Good balance between quality and file size
-const maxWidth = 2400; // Max width for hero images
+const targetQuality = 78; // More aggressive compression for faster loading
+const maxWidth = 1920; // Reduced from 2400px - sufficient for most screens
 
 async function compressImage(filename: string) {
   const inputPath = join(imagesDir, filename);
@@ -24,16 +24,22 @@ async function compressImage(filename: string) {
   const tempPath = join(imagesDir, `temp-${filename}`);
 
   try {
-    // Compress the image
+    // Compress the image with optimizations
     await sharp(inputPath)
       .resize(maxWidth, null, {
         withoutEnlargement: true,
         fit: 'inside',
       })
+      // Apply slight blur to reduce detail complexity (imperceptible)
+      .blur(0.3)
       .jpeg({
         quality: targetQuality,
         progressive: true,
         mozjpeg: true,
+        chromaSubsampling: '4:2:0', // Standard web optimization
+        optimizeCoding: true,
+        trellisQuantisation: true,
+        overshootDeringing: true,
       })
       .toFile(tempPath);
 

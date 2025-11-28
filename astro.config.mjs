@@ -13,6 +13,20 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 8080,
   },
+  image: {
+    service: {
+      entrypoint: 'astro/assets/services/sharp',
+      config: {
+        limitInputPixels: false,
+      },
+    },
+    formats: ['avif', 'webp'],
+    quality: {
+      avif: 65,
+      webp: 75,
+      jpg: 80,
+    },
+  },
   vite: {
     plugins: [tailwindcss()],
   },

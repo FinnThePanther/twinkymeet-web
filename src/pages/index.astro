@@ -86,9 +86,11 @@ try {
               src={communityPhoto.default}
               alt="TwinkyMeet community gathering"
               class="h-full w-full object-cover object-top"
-              widths={[640, 1024, 1920, 2560]}
+              widths={[640, 1024, 1536]}
               sizes="100vw"
               loading="eager"
+              fetchpriority="high"
+              decoding="sync"
             />
             {/* Teal overlay */}
             <div class="bg-primary-500 absolute inset-0 opacity-85 md:opacity-75" />

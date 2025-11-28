@@ -13,6 +13,27 @@ const {
   title = 'TwinkyMeet - Summer Mini-Convention',
   description = 'A summer mini-convention for a close-knit furry community gathering',
 } = Astro.props;
+
+// Import hero images for preloading
+let homeHeroImage, aboutHeroImage, scheduleHeroImage, activitiesHeroImage;
+
+try {
+  homeHeroImage = await import('../images/featured-2.jpg');
+} catch {}
+
+try {
+  aboutHeroImage = await import('../images/home-hero.jpg');
+} catch {}
+
+try {
+  scheduleHeroImage = await import('../images/featured-3.jpg');
+} catch {}
+
+try {
+  activitiesHeroImage = await import('../images/community-social.jpg');
+} catch {}
+
+const currentPath = Astro.url.pathname;
 ---
 
 <!doctype html>
@@ -28,6 +49,43 @@ const {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Preload critical hero images based on current page -->
+    {currentPath === '/' && homeHeroImage && (
+      <link
+        rel="preload"
+        as="image"
+        href={homeHeroImage.default.src}
+        fetchpriority="high"
+      />
+    )}
+
+    {currentPath === '/about' && aboutHeroImage && (
+      <link
+        rel="preload"
+        as="image"
+        href={aboutHeroImage.default.src}
+        fetchpriority="high"
+      />
+    )}
+
+    {currentPath === '/schedule' && scheduleHeroImage && (
+      <link
+        rel="preload"
+        as="image"
+        href={scheduleHeroImage.default.src}
+        fetchpriority="high"
+      />
+    )}
+
+    {currentPath === '/activities' && activitiesHeroImage && (
+      <link
+        rel="preload"
+        as="image"
+        href={activitiesHeroImage.default.src}
+        fetchpriority="high"
+      />
+    )}
 
     <title>{title}</title>
   </head>

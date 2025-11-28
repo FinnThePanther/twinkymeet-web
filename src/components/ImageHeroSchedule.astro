@@ -26,14 +26,19 @@ const eventDateStart = getSetting('event_date_start') || '2026-07-01';
   <!-- Background Image (if provided) -->
   {
     image && (
-      <div class="absolute inset-0 z-0">
-        <Image
-          src={image}
-          alt={title}
-          class="h-full w-full object-cover object-[center_15%]"
-          widths={[640, 1024, 1920]}
-          sizes="100vw"
-        />
+      <div class="absolute inset-0 z-0 bg-primary-700">
+        <div id="hero-image-container" class="hero-image-container opacity-0 transition-opacity duration-300 ease-in-out">
+          <Image
+            src={image}
+            alt={title}
+            class="h-full w-full object-cover object-[center_15%]"
+            widths={[640, 1024, 1536]}
+            sizes="100vw"
+            loading="eager"
+            fetchpriority="high"
+            decoding="sync"
+          />
+        </div>
         {/* Dark overlay for text readability */}
         <div
           class="absolute inset-0 bg-black"
@@ -128,6 +133,19 @@ const eventDateStart = getSetting('event_date_start') || '2026-07-01';
     </div>
   </div>
 </section>
+
+<script>
+  // Show hero image immediately on load
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('hero-image-container');
+    if (container) {
+      requestAnimationFrame(() => {
+        container.classList.remove('opacity-0');
+        container.classList.add('opacity-100');
+      });
+    }
+  });
+</script>
 
 <script define:vars={{ eventDateStart, showCountdown }} is:inline>
   if (showCountdown) {
