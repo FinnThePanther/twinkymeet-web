@@ -1,12 +1,11 @@
 # TwinkyMeet Deployment Guide
 
-This guide covers deploying TwinkyMeet to Cloudflare Pages with D1 database integration.
+This guide covers deploying TwinkyMeet to Railway with a persistent SQLite database.
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) 18+ and pnpm installed
-- [Cloudflare account](https://dash.cloudflare.com/sign-up) (free tier works)
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/) installed
+- [Node.js](https://nodejs.org/) 20+ and pnpm installed
+- [Railway account](https://railway.app/) (free tier available)
 - GitHub repository for the project
 
 ## Local Development Setup
@@ -17,20 +16,29 @@ This guide covers deploying TwinkyMeet to Cloudflare Pages with D1 database inte
 pnpm install
 ```
 
-### 2. Login to Cloudflare
+### 2. Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
 
 ```bash
-pnpm wrangler login
+DATABASE_PATH=./db/local.db
+ADMIN_PASSWORD_HASH=<your-bcrypt-hash>
+SESSION_SECRET=<your-session-secret>
 ```
 
-### 3. Environment Variables
+**Test credentials for local development:**
+- Username: `admin`
+- Password: `admin123`
 
-The `.dev.vars` file contains test credentials for local development:
+The `.env` file is already configured with test credentials and should NOT be committed to git.
 
-- **Test Admin Username**: admin
-- **Test Admin Password**: admin123
+### 3. Initialize Database
 
-This file is already configured and should NOT be committed to git.
+```bash
+pnpm init-db
+```
+
+This creates the SQLite database at `./db/local.db` with all required tables.
 
 ### 4. Start Development Server
 
@@ -40,229 +48,357 @@ pnpm dev
 
 The site will be available at `http://localhost:4321`
 
-## Production Deployment
+## Production Deployment to Railway
 
 ### Step 1: Generate Production Secrets
 
-Run the secret generation script with your desired admin password:
+Generate secure credentials for production using Node.js:
 
 ```bash
-node scripts/generate-secrets.mjs "YourSecurePasswordHere"
+node -e "const bcrypt = require('bcrypt'); const crypto = require('crypto'); const password = 'YourSecurePasswordHere'; bcrypt.hash(password, 10).then(hash => { console.log('ADMIN_PASSWORD_HASH:', hash); console.log('SESSION_SECRET:', crypto.randomBytes(64).toString('hex')); });"
 ```
 
-This will output:
-- `ADMIN_PASSWORD_HASH` - Bcrypt hash of your password
-- `SESSION_SECRET` - Cryptographically secure random string
-
-**⚠️ IMPORTANT**: Store these values securely! You'll need them for Cloudflare Pages configuration.
-
-### Step 2: Set Environment Variables in Cloudflare Pages
-
-1. Go to [Cloudflare Pages dashboard](https://dash.cloudflare.com/?to=/:account/pages)
-2. Select your TwinkyMeet project
-3. Navigate to **Settings** > **Environment variables**
-4. Add the following variables for **Production**:
-
-| Variable Name | Value | Source |
-|--------------|-------|--------|
-| `ADMIN_PASSWORD_HASH` | (from generate-secrets.mjs) | Output of script |
-| `SESSION_SECRET` | (from generate-secrets.mjs) | Output of script |
-
-5. Click **Save**
-
-### Step 3: Deploy to Cloudflare Pages
-
-#### Option A: Deploy via Wrangler (Manual)
+Or install bcrypt globally and run:
 
 ```bash
-pnpm build
-pnpm wrangler pages deploy dist
+npm install -g bcrypt
+node -p "require('bcrypt').hashSync('YourSecurePasswordHere', 10)"
+node -p "require('crypto').randomBytes(64).toString('hex')"
 ```
 
-#### Option B: Deploy via GitHub Integration (Recommended)
+**⚠️ IMPORTANT**: Store these values securely! You'll need them for Railway configuration.
 
-See the **CI/CD Setup** section below for automated deployments.
+### Step 2: Create Railway Project
 
-### Step 4: Initialize Production Database
+1. Go to [Railway dashboard](https://railway.app/dashboard)
+2. Click **New Project** → **Deploy from GitHub repo**
+3. Select your TwinkyMeet repository
+4. Railway will automatically detect the Node.js project
 
-After first deployment, you need to run migrations on the production D1 database:
+### Step 3: Configure Environment Variables
+
+In the Railway project dashboard:
+
+1. Click on your service
+2. Go to **Variables** tab
+3. Add the following environment variables:
+
+| Variable Name | Value | Example |
+|--------------|-------|---------|
+| `DATABASE_PATH` | `/app/data/twinkymeet.db` | Production database path |
+| `ADMIN_PASSWORD_HASH` | (from Step 1) | `$2b$10$...` |
+| `SESSION_SECRET` | (from Step 1) | 64-character hex string |
+
+4. Click **Deploy** to apply changes
+
+### Step 4: Add Persistent Volume
+
+The database needs to persist across deployments:
+
+1. In your Railway service, go to **Volumes** tab
+2. Click **New Volume**
+3. Configure:
+   - **Mount Path**: `/app/data`
+   - **Size**: 1 GB (more than enough for this app)
+4. Click **Add**
+
+Railway will redeploy automatically after adding the volume.
+
+### Step 5: Initialize Production Database
+
+After the first deployment with the volume:
+
+1. Go to your Railway service
+2. Click **Deployments** tab
+3. Click on the most recent deployment
+4. In the deployment logs, verify the app started successfully
+5. The database will be automatically initialized on first run by the `getDb()` function in `src/lib/db.ts`
+
+Alternatively, you can manually initialize via Railway CLI:
 
 ```bash
-pnpm wrangler d1 execute twinkymeet-db --remote --file=db/schema.sql
+# Install Railway CLI
+npm install -g @railway/cli
+
+# Login to Railway
+railway login
+
+# Link to your project
+railway link
+
+# Run init script
+railway run pnpm init-db
 ```
 
-Verify tables were created:
+### Step 6: Verify Deployment
 
-```bash
-pnpm wrangler d1 execute twinkymeet-db --remote --command="SELECT name FROM sqlite_master WHERE type='table';"
-```
-
-### Step 5: Verify Deployment
-
-1. Visit your Cloudflare Pages URL
-2. Navigate to `/admin/login`
-3. Log in with your production admin password
-4. Test RSVP submission, activity submission, and admin features
-
-## CI/CD Setup with GitHub Actions
-
-### Step 1: Create Cloudflare API Token
-
-1. Go to [Cloudflare API Tokens](https://dash.cloudflare.com/profile/api-tokens)
-2. Click **Create Token**
-3. Use the **Edit Cloudflare Workers** template
-4. Configure permissions:
-   - Account > Cloudflare Pages > Edit
-   - Account > D1 > Edit
-5. Set **Account Resources** to include your account
-6. Create token and copy it securely
-
-### Step 2: Add Secrets to GitHub
-
-1. Go to your GitHub repository
-2. Navigate to **Settings** > **Secrets and variables** > **Actions**
-3. Add the following **Repository secrets**:
-
-| Secret Name | Value |
-|------------|-------|
-| `CLOUDFLARE_API_TOKEN` | (API token from Step 1) |
-| `CLOUDFLARE_ACCOUNT_ID` | (from Cloudflare dashboard) |
-| `ADMIN_PASSWORD_HASH` | (from generate-secrets.mjs) |
-| `SESSION_SECRET` | (from generate-secrets.mjs) |
-
-### Step 3: Create GitHub Actions Workflow
-
-Create `.github/workflows/deploy.yml`:
-
-```yaml
-name: Deploy to Cloudflare Pages
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    name: Deploy
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build
-        run: pnpm build
-
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=twinkymeet-web
-        env:
-          ADMIN_PASSWORD_HASH: ${{ secrets.ADMIN_PASSWORD_HASH }}
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-```
-
-### Step 4: Test Automated Deployment
-
-1. Commit and push changes to `main` branch
-2. Check the **Actions** tab in GitHub to see deployment progress
-3. Once complete, verify the site is live
+1. Click **Settings** tab in your Railway service
+2. Find your app URL under **Domains** (e.g., `https://twinkymeet-web-production.up.railway.app`)
+3. Visit the URL and test:
+   - Navigate to `/admin/login`
+   - Log in with your production admin password
+   - Test RSVP submission
+   - Test activity submission
+   - Verify admin features work
 
 ## Database Management
 
 ### View Production Database
 
+Using Railway CLI:
+
 ```bash
-pnpm wrangler d1 execute twinkymeet-db --remote --command="SELECT * FROM attendees;"
+railway connect
+# Then in the shell:
+sqlite3 /app/data/twinkymeet.db
+```
+
+Or run SQL directly:
+
+```bash
+railway run node -e "const db = require('better-sqlite3')('/app/data/twinkymeet.db'); console.log(db.prepare('SELECT * FROM attendees').all());"
 ```
 
 ### Backup Production Database
 
-```bash
-# Export all data
-pnpm wrangler d1 export twinkymeet-db --remote --output=backup.sql
-
-# Or specific table
-pnpm wrangler d1 execute twinkymeet-db --remote --command="SELECT * FROM attendees;" > attendees-backup.json
-```
-
-### Run Migrations
+Download the database file via Railway CLI:
 
 ```bash
-# Production
-pnpm wrangler d1 execute twinkymeet-db --remote --file=db/schema.sql
+# Link to your project first
+railway link
 
-# Local development
-pnpm wrangler d1 execute twinkymeet-db --local --file=db/schema.sql
+# Connect and copy database
+railway connect
+# In the shell:
+cat /app/data/twinkymeet.db > /tmp/backup.db
+exit
+
+# Or use railway run to execute a backup script
+railway run node scripts/backup-db.js
 ```
+
+### Restore from Backup
+
+```bash
+# Upload backup to Railway volume
+railway volume cp ./backup.db /app/data/twinkymeet.db
+```
+
+## Configuration Files
+
+### railway.json
+
+Configures Railway deployment settings:
+
+```json
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "node ./dist/server/entry.mjs",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
+}
+```
+
+### nixpacks.toml
+
+Configures build environment with native dependencies:
+
+```toml
+[phases.setup]
+nixPkgs = ["nodejs_20", "pnpm-9_x", "python3", "gcc", "gnumake"]
+
+[phases.install]
+cmds = ["pnpm install --frozen-lockfile"]
+
+[phases.build]
+cmds = ["pnpm build"]
+
+[start]
+cmd = "HOST=0.0.0.0 PORT=${PORT:-3000} node ./dist/server/entry.mjs"
+```
+
+### astro.config.mjs
+
+Critical configuration for Railway deployment:
+
+```javascript
+import { defineConfig } from 'astro/config';
+import node from '@astrojs/node';
+import tailwindcss from '@tailwindcss/vite';
+
+export default defineConfig({
+  output: 'server',
+  adapter: node({
+    mode: 'standalone',
+  }),
+  server: {
+    host: '0.0.0.0',  // Required for Railway networking
+    port: 8080,
+  },
+  vite: {
+    plugins: [tailwindcss()],
+  },
+});
+```
+
+## CI/CD with GitHub Actions
+
+Railway automatically deploys when you push to your main branch. No GitHub Actions needed!
+
+To disable auto-deployments:
+
+1. Go to your Railway service **Settings**
+2. Under **Deploys**, toggle off **Watch Paths**
 
 ## Troubleshooting
 
+### Issue: 502 Bad Gateway or Connection Refused
+
+**Cause**: Server not binding to the correct host/port
+
+**Solution**: Verify `astro.config.mjs` has:
+```javascript
+server: {
+  host: '0.0.0.0',
+  port: 8080,
+}
+```
+
+### Issue: Database not persisting across deployments
+
+**Cause**: Volume not mounted or wrong database path
+
+**Solution**:
+- Verify volume is mounted at `/app/data`
+- Verify `DATABASE_PATH` environment variable is `/app/data/twinkymeet.db`
+
 ### Issue: "Unauthorized" errors in admin panel
 
-**Solution**: Verify environment variables are set correctly in Cloudflare Pages dashboard.
+**Cause**: Environment variables not set correctly
 
-### Issue: Database not found
+**Solution**:
+- Verify `SESSION_SECRET` and `ADMIN_PASSWORD_HASH` are set in Railway
+- Redeploy after adding environment variables
 
-**Solution**: Ensure D1 binding is configured in `wrangler.toml` and database exists:
+### Issue: Build fails with "gyp ERR! find Python"
 
-```bash
-pnpm wrangler d1 list
+**Cause**: Missing native build dependencies
+
+**Solution**: Ensure `nixpacks.toml` includes:
+```toml
+nixPkgs = ["nodejs_20", "pnpm-9_x", "python3", "gcc", "gnumake"]
 ```
+
+### Issue: Images not loading or very slow
+
+**Cause**: Images too large (35-50MB each)
+
+**Solution**: Run the image compression script:
+```bash
+pnpm compress-images
+```
+
+This compresses images from 35-50MB to <1MB with minimal quality loss.
 
 ### Issue: Session expires immediately
 
-**Solution**: Check that `SESSION_SECRET` matches between local and production environments.
+**Cause**: `SESSION_SECRET` mismatch or not set
 
-### Issue: Build fails during deployment
+**Solution**: Ensure `SESSION_SECRET` is set in Railway environment variables.
 
-**Solution**: Check build logs in Cloudflare Pages dashboard or GitHub Actions. Ensure all dependencies are listed in `package.json`.
+### Issue: Database locked errors
+
+**Cause**: SQLite WAL mode not enabled or concurrent writes
+
+**Solution**: The database uses WAL mode by default. If you still see errors, check that only one instance is running.
+
+## Monitoring and Logs
+
+### View Real-time Logs
+
+In Railway dashboard:
+1. Click on your service
+2. Go to **Deployments** tab
+3. Click on active deployment
+4. Logs stream in real-time
+
+Or via CLI:
+```bash
+railway logs
+```
+
+### View Deployment History
+
+Railway keeps a history of all deployments. Click **Deployments** to see:
+- Build logs
+- Deploy status
+- Rollback options
 
 ## Post-Deployment Checklist
 
 - [ ] Test admin login with production credentials
 - [ ] Submit a test RSVP and verify it appears in admin panel
 - [ ] Submit a test activity and verify approval workflow
-- [ ] Test all admin features (settings, announcements, etc.)
+- [ ] Test all admin features (settings, announcements, RSVP management)
 - [ ] Verify scheduled activities appear on public schedule page
 - [ ] Test on mobile devices
-- [ ] Set up monitoring/alerts (optional)
-- [ ] Configure custom domain (if applicable)
+- [ ] Verify database persists after redeployment
+- [ ] Set up custom domain (if applicable)
+- [ ] Monitor logs for errors
 
 ## Security Notes
 
 1. **Never commit secrets to git**
-   - `.dev.vars` is in `.gitignore`
-   - Use environment variables for all secrets
+   - `.env` is in `.gitignore`
+   - Use Railway environment variables for all secrets
 
 2. **Rotate secrets periodically**
    - Generate new `SESSION_SECRET` every few months
    - Update admin password as needed
 
 3. **Monitor login attempts**
-   - Rate limiting is built-in (5 attempts per 15 minutes)
-   - Check `login_attempts` table for suspicious activity
+   - Rate limiting is built-in via middleware
+   - Check Railway logs for suspicious activity
 
 4. **HTTPS only in production**
-   - Cloudflare Pages enforces HTTPS automatically
+   - Railway enforces HTTPS automatically
    - Session cookies use `Secure` flag in production
+
+5. **Database backups**
+   - Regularly backup `/app/data/twinkymeet.db`
+   - Store backups securely off-site
+
+## Custom Domain Setup
+
+1. In Railway service, go to **Settings** → **Domains**
+2. Click **Custom Domain**
+3. Enter your domain (e.g., `twinkymeet.example.com`)
+4. Add the provided CNAME record to your DNS provider
+5. Wait for DNS propagation (up to 24 hours)
+6. Railway automatically provisions SSL certificate
+
+## Scaling Considerations
+
+For this small event (15-20 people), the default Railway resources are more than sufficient:
+
+- **CPU**: Shared vCPU
+- **RAM**: 512 MB - 1 GB
+- **Storage**: 1 GB volume
+- **Bandwidth**: Unlimited on paid plan
+
+If you need to scale:
+1. Go to **Settings** → **Resources**
+2. Adjust CPU/RAM allocations
+3. Redeploy
 
 ## Additional Resources
 
-- [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages/)
-- [Cloudflare D1 Documentation](https://developers.cloudflare.com/d1/)
-- [Astro Documentation](https://docs.astro.build/)
-- [Wrangler CLI Reference](https://developers.cloudflare.com/workers/wrangler/)
+- [Railway Documentation](https://docs.railway.app/)
+- [Astro SSR Documentation](https://docs.astro.build/en/guides/server-side-rendering/)
+- [better-sqlite3 Documentation](https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md)
+- [Railway CLI Reference](https://docs.railway.app/develop/cli)
