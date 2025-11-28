@@ -12,7 +12,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (isAdminApiRoute && !isAuthEndpoint && !isLogoutEndpoint) {
     // Get session cookie
     const sessionCookie = cookies.get('session')?.value;
-    const sessionSecret = locals.runtime.env.SESSION_SECRET || '';
+    const sessionSecret = process.env.SESSION_SECRET || '';
 
     // Verify session token
     if (!sessionCookie || !verifySessionToken(sessionCookie, sessionSecret)) {
