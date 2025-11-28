@@ -70,6 +70,7 @@ export interface Activity {
   scheduled_start?: string;
   scheduled_end?: string;
   location?: string;
+  notes?: string;
   created_at?: string;
 }
 

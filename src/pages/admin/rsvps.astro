@@ -481,7 +481,7 @@ export const prerender = false;
     // Delete modal elements
     const deleteModal = document.getElementById('delete-modal');
     const cancelDeleteBtn = document.getElementById('cancel-delete-button');
-    const confirmDeleteBtn = document.getElementById('confirm-delete-button');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-button') as HTMLButtonElement;
 
     // Initialize attendees data from table
     function initializeData() {
