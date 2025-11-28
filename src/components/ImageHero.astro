@@ -14,7 +14,7 @@ const {
   title,
   subtitle,
   overlayOpacity = 0.6,
-  showCountdown = false
+  showCountdown = false,
 } = Astro.props;
 
 // Get event date for countdown
@@ -24,66 +24,111 @@ const eventDateStart = getSetting('event_date_start') || '2026-07-01';
 
 <section class="relative overflow-hidden">
   <!-- Background Image (if provided) -->
-  {image && (
-    <div class="absolute inset-0 z-0 bg-primary-700">
-      <div id="hero-image-container" class="hero-image-container absolute inset-0 opacity-0 transition-opacity duration-300 ease-in-out">
-        <Image
-          src={image}
-          alt={title}
-          class="w-full h-full object-cover object-[center_10%]"
-          widths={[640, 1024, 1536]}
-          sizes="100vw"
-          loading="eager"
-          fetchpriority="high"
-          decoding="sync"
+  {
+    image && (
+      <div class="bg-primary-700 absolute inset-0 z-0">
+        <div
+          id="hero-image-container"
+          class="hero-image-container absolute inset-0 opacity-0 transition-opacity duration-300 ease-in-out"
+        >
+          <Image
+            src={image}
+            alt={title}
+            class="h-full w-full object-cover object-[center_10%]"
+            widths={[640, 1024, 1536]}
+            sizes="100vw"
+            loading="eager"
+            fetchpriority="high"
+            decoding="sync"
+          />
+        </div>
+        {/* Dark overlay for text readability */}
+        <div
+          class="absolute inset-0 bg-black"
+          style={`opacity: ${overlayOpacity}`}
         />
       </div>
-      {/* Dark overlay for text readability */}
-      <div
-        class="absolute inset-0 bg-black"
-        style={`opacity: ${overlayOpacity}`}
-      ></div>
-    </div>
-  )}
+    )
+  }
 
   <!-- Gradient fallback if no image -->
-  {!image && (
-    <div class="absolute inset-0 z-0 bg-gradient-to-r from-primary-600 to-primary-800"></div>
-  )}
+  {
+    !image && (
+      <div class="from-primary-600 to-primary-800 absolute inset-0 z-0 bg-gradient-to-r" />
+    )
+  }
 
   <!-- Content -->
-  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
+  <div
+    class="relative z-10 mx-auto max-w-7xl px-4 py-20 sm:px-6 md:py-32 lg:px-8"
+  >
     <div class="text-center text-white">
-      <h1 class="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
+      <h1 class="mb-4 text-4xl font-bold drop-shadow-lg md:text-6xl">
         {title}
       </h1>
-      {subtitle && (
-        <p class="text-xl md:text-2xl text-white text-opacity-90 mb-8 drop-shadow">
-          {subtitle}
-        </p>
-      )}
+      {
+        subtitle && (
+          <p class="text-opacity-90 mb-8 text-xl text-white drop-shadow md:text-2xl">
+            {subtitle}
+          </p>
+        )
+      }
 
       <!-- Countdown Timer -->
-      {showCountdown && (
-        <div id="countdown-timer" class="mt-8 flex justify-center gap-4 md:gap-8">
-          <div class="text-center">
-            <div id="days" class="text-4xl md:text-6xl font-bold text-primary-400">00</div>
-            <div class="text-sm md:text-base text-accent-400 font-semibold mt-1">DAYS</div>
+      {
+        showCountdown && (
+          <div
+            id="countdown-timer"
+            class="mt-8 flex justify-center gap-4 md:gap-8"
+            data-event-date={eventDateStart}
+          >
+            <div class="text-center">
+              <div
+                id="days"
+                class="text-primary-400 text-4xl font-bold md:text-6xl"
+              >
+                00
+              </div>
+              <div class="text-accent-400 mt-1 text-sm font-semibold md:text-base">
+                DAYS
+              </div>
+            </div>
+            <div class="text-center">
+              <div
+                id="hours"
+                class="text-primary-400 text-4xl font-bold md:text-6xl"
+              >
+                00
+              </div>
+              <div class="text-accent-400 mt-1 text-sm font-semibold md:text-base">
+                HRS
+              </div>
+            </div>
+            <div class="text-center">
+              <div
+                id="minutes"
+                class="text-primary-400 text-4xl font-bold md:text-6xl"
+              >
+                00
+              </div>
+              <div class="text-accent-400 mt-1 text-sm font-semibold md:text-base">
+                MIN
+              </div>
+            </div>
+            <div class="text-center">
+              <div
+                id="seconds"
+                class="text-primary-400 text-4xl font-bold md:text-6xl"
+              >
+                00
+              </div>
+              <div class="text-accent-400 mt-1 text-sm font-semibold md:text-base">
+                SEC
+              </div>
+            </div>
           </div>
-          <div class="text-center">
-            <div id="hours" class="text-4xl md:text-6xl font-bold text-primary-400">00</div>
-            <div class="text-sm md:text-base text-accent-400 font-semibold mt-1">HRS</div>
-          </div>
-          <div class="text-center">
-            <div id="minutes" class="text-4xl md:text-6xl font-bold text-primary-400">00</div>
-            <div class="text-sm md:text-base text-accent-400 font-semibold mt-1">MIN</div>
-          </div>
-          <div class="text-center">
-            <div id="seconds" class="text-4xl md:text-6xl font-bold text-primary-400">00</div>
-            <div class="text-sm md:text-base text-accent-400 font-semibold mt-1">SEC</div>
-          </div>
-        </div>
-      )}
+        )
+      }
 
       <!-- Slot for additional content (CTAs, etc.) -->
       <div class="mt-8">
@@ -107,34 +152,45 @@ const eventDateStart = getSetting('event_date_start') || '2026-07-01';
   });
 </script>
 
-{showCountdown && <script define:vars={{ eventDateStart }} is:inline>
-  function updateCountdown() {
-    const eventDate = new Date(eventDateStart + 'T00:00:00').getTime();
-    const now = new Date().getTime();
-    const distance = eventDate - now;
+<script>
+  (() => {
+    const countdownEl = document.getElementById('countdown-timer');
+    const eventDateStart = countdownEl?.dataset.eventDate;
 
-    if (distance < 0) {
-      document.getElementById('countdown-timer')?.classList.add('hidden');
+    if (!countdownEl || !eventDateStart) {
       return;
     }
 
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    const updateCountdown = () => {
+      const eventDate = new Date(eventDateStart + 'T00:00:00').getTime();
+      const now = new Date().getTime();
+      const distance = eventDate - now;
 
-    const daysEl = document.getElementById('days');
-    const hoursEl = document.getElementById('hours');
-    const minutesEl = document.getElementById('minutes');
-    const secondsEl = document.getElementById('seconds');
+      if (distance < 0) {
+        countdownEl.classList.add('hidden');
+        return;
+      }
 
-    if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
-    if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
-    if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
-    if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
-  }
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor(
+        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-  // Update immediately and then every second
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
-</script>}
+      const daysEl = document.getElementById('days');
+      const hoursEl = document.getElementById('hours');
+      const minutesEl = document.getElementById('minutes');
+      const secondsEl = document.getElementById('seconds');
+
+      if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
+      if (hoursEl) hoursEl.textContent = String(hours).padStart(2, '0');
+      if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+      if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+    };
+
+    // Update immediately and then every second
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  })();
+</script>

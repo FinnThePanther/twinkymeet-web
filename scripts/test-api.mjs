@@ -233,7 +233,9 @@ async function test7_DuplicateRSVP() {
     logSuccess('Duplicate RSVP correctly prevented');
     testsPassed++;
   } else {
-    logError(`Expected duplicate prevention, got: ${JSON.stringify(result.data)}`);
+    logError(
+      `Expected duplicate prevention, got: ${JSON.stringify(result.data)}`
+    );
     testsFailed++;
   }
 }

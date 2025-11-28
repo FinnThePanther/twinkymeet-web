@@ -13,6 +13,7 @@ A summer mini-convention website for a close-knit furry community gathering. Fea
 ## 📋 Features
 
 ### Public Features
+
 - Event information and schedule
 - RSVP form for attendees
 - Activity submission form
@@ -20,6 +21,7 @@ A summer mini-convention website for a close-knit furry community gathering. Fea
 - Announcements system
 
 ### Admin Features
+
 - Dashboard with statistics
 - RSVP management (view, edit, delete, export CSV)
 - Activity approval and scheduling workflow
@@ -60,21 +62,22 @@ SESSION_SECRET=9576fc535cb6a6b924fd5f958aa8b1218a4ba734790c69064f0a37c9f5dfbd6ce
 ```
 
 **Default admin credentials (development only):**
+
 - Username: `admin`
 - Password: `admin123`
 
 ## 📦 Commands
 
-| Command | Action |
-| :---------------------- | :----------------------------------------------- |
-| `pnpm install` | Install dependencies |
-| `pnpm dev` | Start dev server at `localhost:4321` |
-| `pnpm build` | Build production site to `./dist/` |
-| `pnpm start` | Start production server (after build) |
-| `pnpm preview` | Preview production build locally |
-| `pnpm init-db` | Initialize SQLite database with schema |
+| Command                | Action                                     |
+| :--------------------- | :----------------------------------------- |
+| `pnpm install`         | Install dependencies                       |
+| `pnpm dev`             | Start dev server at `localhost:4321`       |
+| `pnpm build`           | Build production site to `./dist/`         |
+| `pnpm start`           | Start production server (after build)      |
+| `pnpm preview`         | Preview production build locally           |
+| `pnpm init-db`         | Initialize SQLite database with schema     |
 | `pnpm compress-images` | Compress images in `src/images/` directory |
-| `pnpm format` | Format code with Prettier |
+| `pnpm format`          | Format code with Prettier                  |
 
 ## 🏗️ Project Structure
 
@@ -166,6 +169,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
 ### Feature Toggles
 
 Admin can enable/disable features via Settings page:
+
 - RSVP submissions
 - Activity submissions
 - Photo uploads (post-event)
@@ -173,6 +177,7 @@ Admin can enable/disable features via Settings page:
 ### Event Configuration
 
 Admin can configure via Settings page:
+
 - Event dates (start/end)
 - Location
 - Site-wide announcements
@@ -182,6 +187,7 @@ Admin can configure via Settings page:
 ### Branding
 
 Update colors in `src/layouts/BaseLayout.astro`:
+
 - Primary color: `#8b5cf6` (purple)
 - Accent colors defined in components
 
@@ -194,6 +200,7 @@ pnpm compress-images
 ```
 
 Settings:
+
 - Quality: 85%
 - Max width: 2400px
 - Output: Progressive JPEG with mozjpeg
@@ -201,15 +208,19 @@ Settings:
 ## 🐛 Troubleshooting
 
 ### Database locked errors
+
 The database uses WAL mode for better concurrency. Ensure only one instance is running.
 
 ### Session expires immediately
+
 Check that `SESSION_SECRET` environment variable is set correctly.
 
 ### Images not loading
+
 Run `pnpm compress-images` to compress large images.
 
 ### Admin login fails
+
 1. Verify `ADMIN_PASSWORD_HASH` is set correctly
 2. Check that bcrypt hash matches your password
 3. Generate new hash: `node -p "require('bcrypt').hashSync('password', 10)"`
@@ -240,7 +251,3 @@ Built for the TwinkyMeet furry community gathering.
 - Development: Claude Code + Human collaboration
 - Hosting: Railway
 - Framework: Astro
-
----
-
-**Note**: This project was originally built for Cloudflare Pages with D1 but has been migrated to Railway with better-sqlite3 for simpler deployment and better local development experience.

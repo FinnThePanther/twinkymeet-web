@@ -75,9 +75,7 @@ async function main() {
   console.log(`Max width: ${maxWidth}px\n`);
 
   const files = readdirSync(imagesDir);
-  const imageFiles = files.filter((f) =>
-    f.match(/\.(jpg|jpeg|png|webp)$/i)
-  );
+  const imageFiles = files.filter((f) => f.match(/\.(jpg|jpeg|png|webp)$/i));
 
   console.log(`Found ${imageFiles.length} images to compress`);
 

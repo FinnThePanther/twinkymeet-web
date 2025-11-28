@@ -12,7 +12,9 @@ import type { Attendee } from '../../lib/db';
 const sessionCookie = Astro.cookies.get('session')?.value;
 const sessionSecret = process.env.SESSION_SECRET || '';
 const isAuthenticated =
-  sessionCookie && sessionSecret && verifySessionToken(sessionCookie, sessionSecret);
+  sessionCookie &&
+  sessionSecret &&
+  verifySessionToken(sessionCookie, sessionSecret);
 
 if (!isAuthenticated) {
   return Astro.redirect('/admin/login');
@@ -24,9 +26,13 @@ const rsvpCount = allAttendees.length;
 
 // Count activities by status
 const allActivities = getAllActivities();
-const pendingCount = allActivities.filter(a => a.status === 'pending').length;
-const approvedCount = allActivities.filter(a => a.status === 'approved').length;
-const scheduledCount = allActivities.filter(a => a.status === 'scheduled').length;
+const pendingCount = allActivities.filter((a) => a.status === 'pending').length;
+const approvedCount = allActivities.filter(
+  (a) => a.status === 'approved'
+).length;
+const scheduledCount = allActivities.filter(
+  (a) => a.status === 'scheduled'
+).length;
 
 // Get recent RSVPs (first 5)
 const recentRsvps = allAttendees.slice(0, 5);

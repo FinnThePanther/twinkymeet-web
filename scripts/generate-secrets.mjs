@@ -41,15 +41,21 @@ async function generateSecrets() {
   const sessionSecret = randomBytes(64).toString('hex');
 
   console.log('\n=== PRODUCTION SECRETS ===\n');
-  console.log('Copy these values to your Cloudflare Pages environment variables:\n');
+  console.log(
+    'Copy these values to your Cloudflare Pages environment variables:\n'
+  );
   console.log('ADMIN_PASSWORD_HASH:');
   console.log(adminPasswordHash);
   console.log('\nSESSION_SECRET:');
   console.log(sessionSecret);
   console.log('\n=========================\n');
 
-  console.log('⚠️  IMPORTANT: Store these securely and never commit them to git!');
-  console.log('💡 Add them to Cloudflare Pages dashboard under Settings > Environment variables');
+  console.log(
+    '⚠️  IMPORTANT: Store these securely and never commit them to git!'
+  );
+  console.log(
+    '💡 Add them to Cloudflare Pages dashboard under Settings > Environment variables'
+  );
 }
 
 generateSecrets().catch((error) => {

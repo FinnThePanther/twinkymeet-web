@@ -27,6 +27,7 @@ SESSION_SECRET=<your-session-secret>
 ```
 
 **Test credentials for local development:**
+
 - Username: `admin`
 - Password: `admin123`
 
@@ -83,11 +84,11 @@ In the Railway project dashboard:
 2. Go to **Variables** tab
 3. Add the following environment variables:
 
-| Variable Name | Value | Example |
-|--------------|-------|---------|
-| `DATABASE_PATH` | `/app/data/twinkymeet.db` | Production database path |
-| `ADMIN_PASSWORD_HASH` | (from Step 1) | `$2b$10$...` |
-| `SESSION_SECRET` | (from Step 1) | 64-character hex string |
+| Variable Name         | Value                     | Example                  |
+| --------------------- | ------------------------- | ------------------------ |
+| `DATABASE_PATH`       | `/app/data/twinkymeet.db` | Production database path |
+| `ADMIN_PASSWORD_HASH` | (from Step 1)             | `$2b$10$...`             |
+| `SESSION_SECRET`      | (from Step 1)             | 64-character hex string  |
 
 4. Click **Deploy** to apply changes
 
@@ -237,7 +238,7 @@ export default defineConfig({
     mode: 'standalone',
   }),
   server: {
-    host: '0.0.0.0',  // Required for Railway networking
+    host: '0.0.0.0', // Required for Railway networking
     port: 8080,
   },
   vite: {
@@ -262,6 +263,7 @@ To disable auto-deployments:
 **Cause**: Server not binding to the correct host/port
 
 **Solution**: Verify `astro.config.mjs` has:
+
 ```javascript
 server: {
   host: '0.0.0.0',
@@ -274,6 +276,7 @@ server: {
 **Cause**: Volume not mounted or wrong database path
 
 **Solution**:
+
 - Verify volume is mounted at `/app/data`
 - Verify `DATABASE_PATH` environment variable is `/app/data/twinkymeet.db`
 
@@ -282,6 +285,7 @@ server: {
 **Cause**: Environment variables not set correctly
 
 **Solution**:
+
 - Verify `SESSION_SECRET` and `ADMIN_PASSWORD_HASH` are set in Railway
 - Redeploy after adding environment variables
 
@@ -290,6 +294,7 @@ server: {
 **Cause**: Missing native build dependencies
 
 **Solution**: Ensure `nixpacks.toml` includes:
+
 ```toml
 nixPkgs = ["nodejs_20", "pnpm-9_x", "python3", "gcc", "gnumake"]
 ```
@@ -299,6 +304,7 @@ nixPkgs = ["nodejs_20", "pnpm-9_x", "python3", "gcc", "gnumake"]
 **Cause**: Images too large (35-50MB each)
 
 **Solution**: Run the image compression script:
+
 ```bash
 pnpm compress-images
 ```
@@ -322,12 +328,14 @@ This compresses images from 35-50MB to <1MB with minimal quality loss.
 ### View Real-time Logs
 
 In Railway dashboard:
+
 1. Click on your service
 2. Go to **Deployments** tab
 3. Click on active deployment
 4. Logs stream in real-time
 
 Or via CLI:
+
 ```bash
 railway logs
 ```
@@ -335,6 +343,7 @@ railway logs
 ### View Deployment History
 
 Railway keeps a history of all deployments. Click **Deployments** to see:
+
 - Build logs
 - Deploy status
 - Rollback options
@@ -392,6 +401,7 @@ For this small event (15-20 people), the default Railway resources are more than
 - **Bandwidth**: Unlimited on paid plan
 
 If you need to scale:
+
 1. Go to **Settings** → **Resources**
 2. Adjust CPU/RAM allocations
 3. Redeploy

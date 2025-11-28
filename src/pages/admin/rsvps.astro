@@ -7,7 +7,9 @@ import { verifySessionToken } from '../../lib/auth';
 const sessionCookie = Astro.cookies.get('session')?.value;
 const sessionSecret = process.env.SESSION_SECRET || '';
 const isAuthenticated =
-  sessionCookie && sessionSecret && verifySessionToken(sessionCookie, sessionSecret);
+  sessionCookie &&
+  sessionSecret &&
+  verifySessionToken(sessionCookie, sessionSecret);
 
 if (!isAuthenticated) {
   return Astro.redirect('/admin/login');
@@ -481,7 +483,9 @@ export const prerender = false;
     // Delete modal elements
     const deleteModal = document.getElementById('delete-modal');
     const cancelDeleteBtn = document.getElementById('cancel-delete-button');
-    const confirmDeleteBtn = document.getElementById('confirm-delete-button') as HTMLButtonElement;
+    const confirmDeleteBtn = document.getElementById(
+      'confirm-delete-button'
+    ) as HTMLButtonElement;
 
     // Initialize attendees data from table
     function initializeData() {

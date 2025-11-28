@@ -9,7 +9,9 @@ export const prerender = false;
 const sessionCookie = Astro.cookies.get('session')?.value;
 const sessionSecret = process.env.SESSION_SECRET || '';
 const isAuthenticated =
-  sessionCookie && sessionSecret && verifySessionToken(sessionCookie, sessionSecret);
+  sessionCookie &&
+  sessionSecret &&
+  verifySessionToken(sessionCookie, sessionSecret);
 
 if (!isAuthenticated) {
   return Astro.redirect('/admin/login');
@@ -104,8 +106,10 @@ const activities = getAllActivities();
                           : 'bg-gray-100 text-gray-800'
                   }`}
                 >
-                  {activity.status ? activity.status.charAt(0).toUpperCase() +
-                    activity.status.slice(1) : 'Unknown'}
+                  {activity.status
+                    ? activity.status.charAt(0).toUpperCase() +
+                      activity.status.slice(1)
+                    : 'Unknown'}
                 </span>
               </div>
 

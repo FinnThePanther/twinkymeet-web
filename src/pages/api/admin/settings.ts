@@ -188,8 +188,14 @@ export const PUT: APIRoute = async ({ request, locals }) => {
       }
     );
   } catch (error) {
-    console.error('Error updating settings:', error instanceof Error ? error.message : String(error));
-    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error(
+      'Error updating settings:',
+      error instanceof Error ? error.message : String(error)
+    );
+    console.error(
+      'Error stack:',
+      error instanceof Error ? error.stack : 'No stack trace'
+    );
     return new Response(
       JSON.stringify({
         success: false,

@@ -9,7 +9,9 @@ export const prerender = false;
 const sessionCookie = Astro.cookies.get('session')?.value;
 const sessionSecret = process.env.SESSION_SECRET || '';
 const isAuthenticated =
-  sessionCookie && sessionSecret && verifySessionToken(sessionCookie, sessionSecret);
+  sessionCookie &&
+  sessionSecret &&
+  verifySessionToken(sessionCookie, sessionSecret);
 
 if (!isAuthenticated) {
   return Astro.redirect('/admin/login');

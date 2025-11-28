@@ -1,6 +1,3 @@
-# Components with script tag parsing issues
-src/components/ImageHero.astro
-
 # Build outputs
 dist/
 .astro/
