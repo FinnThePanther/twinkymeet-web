@@ -11,7 +11,7 @@ export default defineConfig({
   }),
   server: {
     host: '0.0.0.0',
-    port: 8080,
+    port: parseInt(process.env.PORT || '8080'),
   },
   image: {
     service: {

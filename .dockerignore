@@ -1,0 +1,52 @@
+# Git
+.git/
+.gitignore
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.astro/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Local database
+db/local.db
+db/*.db-shm
+db/*.db-wal
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Railway specific
+railway.json
+nixpacks.toml
+
+# Backups
+*.backup
+railway-backup*.db
+
+# Claude
+.claude/
+
+# Misc
+README.md
+DEPLOYMENT.md
+prds/
+scripts/compress-images.ts

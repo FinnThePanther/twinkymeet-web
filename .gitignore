@@ -38,3 +38,10 @@ db/*.db-wal
 # LLM Stuff
 /prds
 CLAUDE.md
+
+# Migration backups and sensitive data
+railway-backup*.db
+railway-env-backup.txt
+current-dns.txt
+*-backup-*.db
+*.backup
