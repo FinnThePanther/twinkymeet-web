@@ -29,6 +29,9 @@ importers:
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
+      sharp:
+        specifier: ^0.34.5
+        version: 0.34.5
       tailwindcss:
         specifier: ^4.1.16
         version: 4.1.16
@@ -51,9 +54,6 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.7.1
         version: 0.7.1(prettier-plugin-astro@0.14.1)(prettier@3.6.2)
-      sharp:
-        specifier: ^0.34.5
-        version: 0.34.5
       tsx:
         specifier: ^4.20.6
         version: 4.20.6
