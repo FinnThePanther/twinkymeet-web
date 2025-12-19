@@ -1,7 +1,7 @@
 # Fly.io application configuration for TwinkyMeet
 
 app = "twinkymeet-web"
-primary_region = "lax" # Los Angeles - adjust based on your location
+primary_region = "sjc" # San Jose, California (closest to Seattle)
 
 # Dockerfile configuration
 [build]
@@ -16,10 +16,9 @@ primary_region = "lax" # Los Angeles - adjust based on your location
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = false  # Keep running for better response times
+  auto_stop_machines = "off"  # Keep running for better response times
   auto_start_machines = true
   min_machines_running = 1
-  processes = ["app"]
 
   # Concurrency limits
   [http_service.concurrency]
@@ -27,22 +26,12 @@ primary_region = "lax" # Los Angeles - adjust based on your location
     hard_limit = 250
     soft_limit = 200
 
-  # Health check endpoint
-  [[http_service.checks]]
-    grace_period = "10s"
-    interval = "30s"
-    method = "GET"
-    timeout = "5s"
-    path = "/"
-
 # Persistent storage for SQLite database
 [mounts]
   source = "twinkymeet_data"
   destination = "/app/data"
-  initial_size = "1gb"
 
-# VM resources (adjust based on needs)
-[vm]
-  cpu_kind = "shared"
-  cpus = 1
-  memory_mb = 512
+# VM resources
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
